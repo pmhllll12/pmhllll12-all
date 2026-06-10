@@ -1,0 +1,39 @@
+# 브라우저는 http://localhost:3000 만 사용 (gateway → backend / frontend)
+services:
+  backend:
+    build:
+      context: ./minho
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    env_file:
+      - ./minho/.env
+    environment:
+      API_HOST: "0.0.0.0"
+      UVICORN_RELOAD: "0"
+    restart: always
+
+  # Vite preview — 호스트 포트 없음. 반드시 0.0.0.0:3000 리슨(www/vite.config.ts preview.host)
+  frontend:
+    build:
+      context: ./www
+    expose:
+      - "3000"
+    env_file:
+      - path: ./www/.env.local
+        required: false
+    restart: always
+    depends_on:
+      - backend
+
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./docker/gateway.default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: always

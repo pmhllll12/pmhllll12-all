@@ -1,9 +1,9 @@
 [submodule "backend-mod"]
-	path = backend
+	path = minho
 	url = https://github.com/pmhllll12/cloud.pmhllll12.api.git
 [submodule "frontend-mod"]
-	path = frontend
+	path = www
 	url = https://github.com/pmhllll12/cloud.pmhllll12.www.git
 [submodule "docs-mod"]
-	path = docs
+	path = vault
 	url = https://github.com/pmhllll12/cloud.pmhllll12.docs.git

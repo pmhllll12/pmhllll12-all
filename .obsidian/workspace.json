@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "faa0ec32c8f257cb",
+        "id": "930e6b3c965015d7",
         "type": "tabs",
         "children": [
           {
-            "id": "21d5efd73dc6ef94",
+            "id": "f54b91abced513ca",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "minho/apps/titanic/_docs/README.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "README"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "그래프 뷰"
             }
           }
         ]
@@ -180,33 +176,43 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "b0e6658b8b8ba1b3",
+  "active": "f54b91abced513ca",
   "lastOpenFiles": [
-    "_harness/config.yaml",
-    "minho/apps/titanic/_docs/README.md",
-    "_harness/config.yaml.md",
-    "vault/DevOps/Frontend/REACT_RULES.md",
-    "vault/DevOps/Backend/TITANIC_ERD.md",
-    "vault/DevOps/Backend/SOCCER_ERD.md",
-    "vault/DevOps/Backend/ENTITY_RULE.md",
-    "www/apps/titanic/README.md",
-    "www/node_modules/@oxc-project/types/README.md",
-    "www/node_modules/nanoid/README.md",
-    "www/node_modules/@rolldown/pluginutils/README.md",
-    "www/node_modules/@rolldown/binding-win32-x64-msvc/README.md",
-    "www/node_modules/@google/generative-ai/README.md",
-    "www/README.md",
+    "minho/apps/titanic/app/use_cases/crew_smith_captin_interactor.py.tmp.25072.49f1be393df5",
+    "minho/apps/titanic/app/use_cases/crew_smith_captin_interactor.py.tmp.25072.983e8a3cba01",
+    "minho/apps/titanic/adapter/outbound/orm/passenger_rose_model_strategies.py.tmp.25072.ef81729a8f0b",
+    "minho/apps/titanic/app/use_cases/passenger_jack_trainer_interactor.py.tmp.25072.be35ba901799",
+    "minho/apps/titanic/adapter/outbound/repositories/crew_walter_roaster_repository.py.tmp.25072.db1c1caaf148",
+    "minho/alembic/versions/20260617_0001_create_passengers_bookings.py",
+    "minho/alembic/versions/20260617_0001_create_passengers_bookings.py.tmp.25072.1bd390fd7e72",
+    "minho/apps/titanic/app/use_cases/crew_walter_roaster_interactor.py.tmp.25072.9bdcab29b986",
+    "minho/alembic/versions/20260522_0001_stub.py",
+    "minho/alembic/versions/20260522_0001_stub.py.tmp.25072.519343602142",
+    "minho/Dockerfile.tmp.25072.96fc0b7b157a",
+    "minho/apps/titanic/_docs/titanic-walter.md",
+    "minho/alembic/README.md",
+    "minho/README.md",
     "CLAUDE.md",
-    ".git/modules/frontend-mod/logs/refs/remotes/origin/main",
-    ".git/modules/frontend-mod/logs/refs/remotes/origin/HEAD",
-    ".git/modules/docs-mod/logs/refs/remotes/origin/main",
-    ".git/modules/docs-mod/logs/refs/remotes/origin/HEAD",
-    ".git/modules/backend-mod/logs/refs/remotes/origin/main",
-    ".git/modules/backend-mod/logs/refs/remotes/origin/HEAD",
-    ".git/modules/frontend-mod/refs/remotes/origin/main",
-    ".git/modules/frontend-mod/refs/remotes/origin/HEAD",
-    ".git/modules/docs-mod/refs/remotes/origin/main",
-    ".git/modules/frontend-mod/logs/refs/remotes/origin",
-    "AGENTS.md"
+    "www/CLAUDE.md",
+    "minho/apps/titanic/_docs/CLAUDE.md",
+    "minho/CLAUDE.md",
+    "minho/apps/titanic/_docs/titanic-algorithm.md",
+    "vault/www/DEV_SERVER.md",
+    "CURSOR.md",
+    "www/README.md",
+    "www/node_modules/picomatch/README.md",
+    "www/node_modules/cookie/README.md",
+    "minho/apps/soccer/_docs/SOCCER_ERD.md",
+    "minho/apps/titanic/_docs/TITANIC_ERD.md",
+    "DEV_SERVER.md",
+    "vault/Frontend/DEV_SERVER.md",
+    "minho/apps/titanic/_docs/ENTITY_RULE.md",
+    "vault/Backend/CLAUDE.md",
+    "vault/Backend/harness.md",
+    "vault/Backend/README.md",
+    "vault/Backend/AGENTS.md",
+    "minho/apps/soccer/_docs/CLAUDE.md",
+    "minho/apps/soccer/docs/SOCCER_ERD.md",
+    "vault/Frontend/react_rules.md"
   ]
 }

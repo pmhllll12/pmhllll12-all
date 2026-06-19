@@ -74,7 +74,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 509.5
+    "width": 286.5
   },
   "right": {
     "id": "cc921429355f9b18",
@@ -178,17 +178,18 @@
   },
   "active": "f54b91abced513ca",
   "lastOpenFiles": [
-    "minho/apps/titanic/app/use_cases/crew_smith_captin_interactor.py.tmp.25072.49f1be393df5",
-    "minho/apps/titanic/app/use_cases/crew_smith_captin_interactor.py.tmp.25072.983e8a3cba01",
-    "minho/apps/titanic/adapter/outbound/orm/passenger_rose_model_strategies.py.tmp.25072.ef81729a8f0b",
-    "minho/apps/titanic/app/use_cases/passenger_jack_trainer_interactor.py.tmp.25072.be35ba901799",
-    "minho/apps/titanic/adapter/outbound/repositories/crew_walter_roaster_repository.py.tmp.25072.db1c1caaf148",
-    "minho/alembic/versions/20260617_0001_create_passengers_bookings.py",
-    "minho/alembic/versions/20260617_0001_create_passengers_bookings.py.tmp.25072.1bd390fd7e72",
-    "minho/apps/titanic/app/use_cases/crew_walter_roaster_interactor.py.tmp.25072.9bdcab29b986",
-    "minho/alembic/versions/20260522_0001_stub.py",
-    "minho/alembic/versions/20260522_0001_stub.py.tmp.25072.519343602142",
-    "minho/Dockerfile.tmp.25072.96fc0b7b157a",
+    "apps/harry_poter/app/use_cases/lovegood_course_interactor.py",
+    "apps/harry_poter/app/use_cases/weasley_booking_interactor.py",
+    "apps/harry_poter/app/use_cases/professor_festival_interactor.py",
+    "apps/harry_poter/app/use_cases/dumbledore_store_interactor.py",
+    "apps/harry_poter/app/use_cases/hermione_route_interactor.py",
+    "apps/harry_poter/app/use_cases/wizard_point_interactor.py",
+    "apps/harry_poter/app/use_cases/sphinx_quiz_interactor.py",
+    "apps/harry_poter/app/use_cases/hogwarts_hertage_interactor.py",
+    "apps/harry_poter/app/use_cases/harry_user_interactor.py",
+    "apps/harry_poter/domain/value_objects/__init__.py",
+    "apps/harry_poter/domain/entities/__init__.py",
+    "minho/apps/titanic/_generated/plots/correlation_plot.png",
     "minho/apps/titanic/_docs/titanic-walter.md",
     "minho/alembic/README.md",
     "minho/README.md",

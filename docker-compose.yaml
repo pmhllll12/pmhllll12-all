@@ -14,7 +14,7 @@ services:
       UVICORN_RELOAD: "0"
     restart: always
 
-  # Vite preview — 호스트 포트 없음. 반드시 0.0.0.0:3000 리슨(www/vite.config.ts preview.host)
+  # Next.js (next start) — 호스트 포트 없음. 컨테이너 내부 0.0.0.0:3000 리슨
   frontend:
     build:
       context: ./www

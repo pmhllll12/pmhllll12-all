@@ -12,6 +12,22 @@
 
 ---
 
+## 문서 배치 규칙 (`_docs`)
+
+모든 비코드 규칙·가이드 MD는 내용의 범위에 따라 아래 4곳 중 하나에 둔다. 새 문서를 추가할 때도 이 표를 기준으로 위치를 정한다.
+
+| 내용 범위 | 위치 | 예 |
+|-----------|------|------|
+| 공통(전 영역 공통 원칙·하네스) | [`_docs/`](_docs/) | `_docs/CLAUDE.md`, `_docs/AGENTS.md`, `_docs/DEV_SERVER.md` |
+| 백엔드(`minho`) 전용 | [`minho/_docs/`](minho/_docs/) | `minho/_docs/entity-rules.md`, `auth-rules.md` 등 |
+| 프런트엔드(`www`) 전용 | [`www/_docs/`](www/_docs/) | `www/_docs/react_rules.md`, `darkmode-spec.md` |
+| 플러터(`pmh_flutter`) 전용 | [`pmh_flutter/_docs/`](pmh_flutter/_docs/) | (앱 추가 시 생성) |
+
+- `minho/apps/<앱>/_docs/`(예: `titanic`)처럼 **앱 단위로 더 좁은 범위**가 필요하면 해당 앱 폴더 하위에 별도 `_docs/`를 둔다 — 위 표보다 우선한다.
+- 과거 `vault/` 서브모듈에 두던 공통·영역별 문서는 모두 위 구조로 이전했다. 새 문서를 `vault/`에 추가하지 않는다.
+
+---
+
 ## 빠른 실행
 
 - API 문서: `http://localhost:8000/docs` (백엔드 기동 후)

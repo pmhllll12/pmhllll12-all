@@ -4,6 +4,3 @@
 [submodule "frontend-mod"]
 	path = www
 	url = https://github.com/pmhllll12/cloud.pmhllll12.www.git
-[submodule "docs-mod"]
-	path = vault
-	url = https://github.com/pmhllll12/cloud.pmhllll12.docs.git

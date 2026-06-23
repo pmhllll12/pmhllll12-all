@@ -2,16 +2,16 @@
 
 이 파일은 Cursor 에이전트의 **얇은 진입 하네스**다. 침묵 가정·과설계·스코프 확장·모호한 “됐다” 선언을 줄인다.
 
-## 0. 규칙 정본 — 반드시 `vault/` 경유 (필독)
+## 0. 규칙 정본 — 반드시 `_docs/` 경유 (필독)
 
-코드·명령·설명을 내기 **전에** [`vault/`](vault/) 트리의 정본을 인지한다. `vault/` 없이 일반 관행만으로 구현하지 않는다.
+코드·명령·설명을 내기 **전에** [`_docs/`](_docs/) 트리의 정본을 인지한다. 공통 규칙은 `_docs/`, 영역별 규칙은 각 워크스페이스의 `_docs/`(`minho/_docs/`, `www/_docs/`, `pmh_flutter/_docs/`)에 둔다. 배치 규칙 전문 ---> [`CLAUDE.md`](CLAUDE.md#문서-배치-규칙-_docs).
 
-- Cursor: **`@vault`** 또는 최소 **`@vault/AGENTS.md`**, **`@vault/CLAUDE.md`**, **`@vault/CURSOR.md`** 중 해당 문서를 `@`로 첨부한다.
-- 에이전트 도구: 저장소 루트 기준 **`vault/...`** 경로로 읽는다. `minho/`·`www/`만 워크스페이스여도 **상위 `vault/`** 를 찾는다.
-- 영역별 상세: DevOps·프런트·백엔드·앱은 **`vault/` 하위 MD**와 **아래 4층 `.cursorrules`** 를 따른다.
-- 컨텍스트 부족: 추측하지 말고 사용자에게 **`@vault` 첨부**를 요청한다.
+- Cursor: **`@_docs`** 또는 최소 **`@_docs/AGENTS.md`**, **`@_docs/CLAUDE.md`** 중 해당 문서를 `@`로 첨부한다.
+- 에이전트 도구: 저장소 루트 기준 **`_docs/...`** 경로로 읽는다. `minho/`·`www/`만 워크스페이스여도 **상위 `_docs/`** 를 찾는다.
+- 영역별 상세: 백엔드·프런트·플러터·앱은 **각 워크스페이스의 `_docs/`**와 **아래 4층 `.cursorrules`** 를 따른다.
+- 컨텍스트 부족: 추측하지 말고 사용자에게 **`@_docs` 첨부**를 요청한다.
 
-**필독:** [`vault/AGENTS.md`](vault/AGENTS.md) · 상세 문구 ---> [`vault/CLAUDE.md`](vault/CLAUDE.md) · 루트 지도 ---> [`CLAUDE.md`](CLAUDE.md)
+**필독:** [`_docs/AGENTS.md`](_docs/AGENTS.md) · 상세 문구 ---> [`_docs/CLAUDE.md`](_docs/CLAUDE.md) · 루트 지도 ---> [`CLAUDE.md`](CLAUDE.md)
 
 ## 1. 작업 경로별 추가 규칙
 
@@ -24,9 +24,9 @@
 
 ## 2–4. 공통 원칙 (요약만 — 전문은 vault)
 
-- **구현 전 사고** ---> [`vault/AGENTS.md` §1](vault/AGENTS.md#1-구현-전-사고-think-before-coding)
-- **단순성 우선** ---> [`vault/AGENTS.md` §2](vault/AGENTS.md#2-단순성-우선-simplicity-first)
-- **정밀한 수정** ---> [`vault/AGENTS.md` §3](vault/AGENTS.md#3-정밀한-수정-surgical-changes)
-- **목표 중심 실행** ---> [`vault/AGENTS.md` §4](vault/AGENTS.md#4-목표-중심-실행-goal-driven-execution)
+- **구현 전 사고** ---> [`_docs/AGENTS.md` §1](_docs/AGENTS.md#1-구현-전-사고-think-before-coding)
+- **단순성 우선** ---> [`_docs/AGENTS.md` §2](_docs/AGENTS.md#2-단순성-우선-simplicity-first)
+- **정밀한 수정** ---> [`_docs/AGENTS.md` §3](_docs/AGENTS.md#3-정밀한-수정-surgical-changes)
+- **목표 중심 실행** ---> [`_docs/AGENTS.md` §4](_docs/AGENTS.md#4-목표-중심-실행-goal-driven-execution)
 
 **트레이드오프:** 속도보다 신중함. 사소한 작업은 판단으로 완화한다.

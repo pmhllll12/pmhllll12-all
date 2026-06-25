@@ -1,0 +1,25 @@
+# minho/www는 서브모듈(별도 저장소)이라 자기 자신의 .pre-commit-config.yaml을 따로
+# 가진다 (minho/.pre-commit-config.yaml, www/.pre-commit-config.yaml) — 거기서
+# `pre-commit install`을 각각 한 번씩 해야 그 저장소의 커밋에 걸린다.
+# 이 루트 파일은 pmh_flutter(서브모듈 아님, 이 저장소의 일반 디렉터리)만 다룬다.
+#
+# 설치 (루트에서, 최초 1회):
+#   pip install pre-commit
+#   pre-commit install
+
+repos:
+  - repo: local
+    hooks:
+      - id: flutter-analyze
+        name: "[pmh_flutter] dart analyze"
+        entry: dart analyze pmh_flutter/pmh_flutter_application_1
+        language: system
+        files: ^pmh_flutter/pmh_flutter_application_1/.*\.dart$
+        pass_filenames: false
+
+      - id: flutter-format
+        name: "[pmh_flutter] dart format --check"
+        entry: dart format --output=none --set-exit-if-changed pmh_flutter/pmh_flutter_application_1
+        language: system
+        files: ^pmh_flutter/pmh_flutter_application_1/.*\.dart$
+        pass_filenames: false

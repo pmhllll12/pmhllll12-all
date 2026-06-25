@@ -57,3 +57,4 @@
 | `../www/.cursorrules` | 프론트 (`www/`). |
 | `../minho/apps/titanic/.cursorrules` | 타이타닉 앱 (시블링 앱 템플릿). |
 | `../minho/apps/<앱>/_docs/CLAUDE.md` | 앱별 상세 (추가 앱도 동일 패턴). |
+| `HARNESS-TOOLING.md` | 4원칙을 실제로 강제하는 린터/포매터/pre-commit/CI 설정 위치. |

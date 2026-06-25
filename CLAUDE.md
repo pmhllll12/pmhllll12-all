@@ -56,6 +56,7 @@
 1. [`CLAUDE.md`](CLAUDE.md) — **정본.** 네 원칙 전문·예시·`단계 → 검증` 템플릿. 프로젝트별 지침과 **병합**해 해석한다.
 2. [`.cursorrules`](.cursorrules) — Cursor에 **항시** 주입되는 짧은 제약(경계·diff·완료 조건).
 3. [`CURSOR.md`](CURSOR.md) — Cursor에서의 **운영 규약**(@ 컨텍스트, 프롬프트 설계, `.cursor/rules` 주의).
+4. [`_docs/HARNESS-TOOLING.md`](_docs/HARNESS-TOOLING.md) — 위 원칙을 실제로 강제하는 린터·포매터·pre-commit·CI가 **어디에** 있는지(서브모듈 경계 주의).
 
 원칙을 바꾸지 않는 한, 세 문서는 서로 **역할만** 나누고 같은 뜻을 유지한다.
 

@@ -1,0 +1,29 @@
+name: flutter-lint
+
+# pmh_flutter는 서브모듈이 아니라 이 저장소(cloud.pmhllll12) 안의 일반 디렉터리이므로
+# 루트 .github/workflows/에 두는 게 맞다 (minho/www는 자기 저장소에 따로 둔다).
+on:
+  pull_request:
+    paths:
+      - "pmh_flutter/**"
+  push:
+    branches: [main]
+    paths:
+      - "pmh_flutter/**"
+
+jobs:
+  analyze-and-format:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pmh_flutter/pmh_flutter_application_1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+      - run: dart analyze .
+      - run: dart format --output=none --set-exit-if-changed .

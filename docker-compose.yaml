@@ -12,6 +12,11 @@ services:
     environment:
       API_HOST: "0.0.0.0"
       UVICORN_RELOAD: "0"
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@pgvector:5432/${POSTGRES_DB:-neondb}
+    depends_on:
+      - pgvector
+      - neo4j
+      - redis
     restart: always
 
   # Next.js (next start) — 호스트 포트 없음. 컨테이너 내부 0.0.0.0:3000 리슨
@@ -46,5 +51,40 @@ services:
       - n8n_data:/home/node/.n8n
     restart: always
 
+  neo4j:
+    image: neo4j:5-community
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}
+    volumes:
+      - neo4j_data:/data
+    restart: always
+
+  pgvector:
+    image: pgvector/pgvector:pg17
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-neondb}
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: always
+
 volumes:
   n8n_data:
+  neo4j_data:
+  pgvector_data:
+  redis_data:

@@ -12,7 +12,7 @@ services:
     environment:
       API_HOST: "0.0.0.0"
       UVICORN_RELOAD: "0"
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@pgvector:5432/${POSTGRES_DB:-neondb}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@pgvector:5432/${POSTGRES_DB:-neondb}?sslmode=disable
       OLLAMA_HOST: http://host.docker.internal:11434
       N8N_COMMUNITY_EMAIL_WEBHOOK_URL: http://n8n:5678/webhook/community-email
     depends_on:
@@ -74,6 +74,17 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-neondb}
     volumes:
       - pgvector_data:/var/lib/postgresql/data
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - pgvector
     restart: always
 
   redis:

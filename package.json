@@ -2,8 +2,8 @@
   "name": "cloud-pmhllll12",
   "private": true,
   "scripts": {
-    "dev": "npm run dev --prefix frontend",
-    "dev:frontend": "npm run dev --prefix frontend",
+    "dev": "npm run dev --prefix www",
+    "dev:frontend": "npm run dev --prefix www",
     "dev:api": "npm run dev:api --prefix backend"
   }
 }

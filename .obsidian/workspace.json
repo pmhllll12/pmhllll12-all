@@ -178,17 +178,18 @@
   },
   "active": "f54b91abced513ca",
   "lastOpenFiles": [
-    "minho/apps/silicon_valley/adapter/outbound/mapper/__pycache__/piper_hendricks_ceo_mapper.cpython-313.pyc",
-    "minho/apps/silicon_valley/adapter/outbound/mapper/__pycache__/piper_gilfoyle_system_mapper.cpython-313.pyc",
-    "minho/apps/silicon_valley/domain/entities/__pycache__/__init__.cpython-313.pyc",
-    "minho/apps/silicon_valley/domain/entities/__pycache__/piper_hendricks_ceo_entity.cpython-313.pyc",
-    "minho/apps/silicon_valley/domain/entities/__pycache__/piper_gilfoyle_system_entity.cpython-313.pyc",
-    "minho/apps/silicon_valley/domain/entities/__pycache__/piper_dunn_coo_entity.cpython-313.pyc",
-    "minho/apps/silicon_valley/domain/entities/__pycache__/piper_dinesh_dash_entity.cpython-313.pyc",
-    "minho/apps/silicon_valley/domain/entities/__pycache__/piper_bighetti_hr_entity.cpython-313.pyc",
-    "minho/apps/silicon_valley/domain/entities/__pycache__",
-    "minho/apps/silicon_valley/adapter/outbound/mapper/__pycache__/__init__.cpython-313.pyc",
-    "minho/apps/silicon_valley/adapter/outbound/mapper/__pycache__/piper_dunn_coo_mapper.cpython-313.pyc",
+    "minho/apps/community/_docs/watcher-policy.md",
+    "minho/apps/community/_docs/mail-policy.md",
+    "minho/apps/community/adapter/inbound/api/v1/receiver_router.py.tmp.25120.3a00de90e2a6",
+    "minho/apps/community/adapter/outbound/repositories/receiver_repository.py.tmp.25120.c354235c86be",
+    "minho/alembic/env.py.tmp.25120.a3b2190cb452",
+    "minho/alembic/versions/20260702_0001_create_received_emails.py",
+    "minho/alembic/versions/20260702_0001_create_received_emails.py.tmp.25120.d555e8afa9fd",
+    "minho/database.py.tmp.25120.2bc312c73d46",
+    "minho/apps/community/adapter/outbound/orm/received_email_orm.py",
+    "minho/apps/community/adapter/outbound/orm/received_email_orm.py.tmp.25120.321e1fd1bd04",
+    "minho/apps/community/adapter/outbound/gemini_embedding_client.py",
+    "minho/apps/community/adapter/outbound/gemini_embedding_client.py.tmp.25120.75341cf2a8f3",
     "www/src/assets/theme-toggle.png",
     "www/_docs/darkmode-spec.md",
     "www/_docs/ragwatson_darkmode_spec.md",
@@ -214,7 +215,6 @@
     "vault/Backend/CLAUDE.md",
     "vault/Backend/harness.md",
     "vault/Backend/README.md",
-    "vault/Backend/AGENTS.md",
-    "minho/apps/soccer/_docs/CLAUDE.md"
+    "vault/Backend/AGENTS.md"
   ]
 }

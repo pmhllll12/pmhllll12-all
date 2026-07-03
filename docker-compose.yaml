@@ -98,6 +98,16 @@ services:
     command: redis-server --appendonly yes
     restart: always
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - n8n
+      - backend
+    restart: always
+
 volumes:
   n8n_data:
   neo4j_data:

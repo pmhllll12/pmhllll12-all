@@ -80,7 +80,7 @@ class IntroScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       const _HeroTitle(),
                       const SizedBox(height: 20),
-                      Text(
+                      const Text(
                         '조별 리그부터 결승까지 — 일정·대진·골 순위·하이라이트를 한 곳에 모아\n'
                         '월드컵의 모든 순간을 함께 안내하는 시스템입니다.',
                         style: TextStyle(
@@ -197,9 +197,9 @@ class _HeroTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
           '32개국 64경기를 한 화면에',
           style: TextStyle(

@@ -1,0 +1,87 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-bg-0: #04070f;
+  --color-bg-1: #0a1020;
+  --color-fg-0: #ffffff;
+  --color-fg-1: #cbd5e1;
+  --color-fg-2: #94a3b8;
+  --color-fg-3: #64748b;
+  --color-accent: #22d3ee;
+  --color-accent-strong: #06b6d4;
+  --color-accent-soft: rgba(34, 211, 238, 0.18);
+  --color-border: rgba(148, 163, 184, 0.18);
+  --color-chip-bg: rgba(148, 163, 184, 0.08);
+  --color-chip-border: rgba(148, 163, 184, 0.22);
+  --font-display: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR",
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+
+  /* 기존 CSS의 max-width 브레이크포인트를 그대로 옮긴 커스텀 min-width 변형 */
+  --breakpoint-380: 380px;
+  --breakpoint-480: 480px;
+  --breakpoint-520: 520px;
+  --breakpoint-600: 600px;
+  --breakpoint-640: 640px;
+  --breakpoint-720: 720px;
+  --breakpoint-800: 800px;
+  --breakpoint-900: 900px;
+  --breakpoint-1200: 1200px;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-bg-0: #f8fafc;
+  --color-bg-1: #ffffff;
+  --color-fg-0: #0f172a;
+  --color-fg-1: #334155;
+  --color-fg-2: #64748b;
+  --color-fg-3: #94a3b8;
+  --color-accent: #0891b2;
+  --color-accent-strong: #0e7490;
+  --color-accent-soft: rgba(8, 145, 178, 0.12);
+  --color-border: rgba(15, 23, 42, 0.12);
+  --color-chip-bg: rgba(15, 23, 42, 0.04);
+  --color-chip-border: rgba(15, 23, 42, 0.1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-display);
+  color: var(--color-fg-0);
+  background: var(--color-bg-0);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}

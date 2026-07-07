@@ -1,0 +1,25 @@
+# 에이전트 하네스 — 백엔드 (`minho`)
+
+**필독:** [`../_docs/AGENTS.md`](../_docs/AGENTS.md) · [`CLAUDE.md`](CLAUDE.md) · 루트 [`../CLAUDE.md`](../CLAUDE.md)
+
+## 0. `_docs/` 경유
+
+공통 규칙은 **`../_docs/`** 정본을 읽는다. 백엔드 전용 규칙(엔티티 등)은 [`_docs/`](_docs/) 를 따른다.
+
+## 1. 스코프
+
+- FastAPI 라우트·유스케이스·ORM·마이그레이션은 **요청된 앱·엔드포인트**만 수정한다.
+- `apps/titanic/**` 작업 시 ---> [`apps/titanic/.cursorrules`](apps/titanic/.cursorrules) 추가 적용.
+- `main.py`는 라우터 마운트·공통 미들웨어만; 앱 비즈니스 로직은 `apps/<앱>/` 에 둔다.
+
+## 2. 검증
+
+- import 오류: `cd minho` 후 `python -c "from main import app"`.
+- API: `/docs` 또는 해당 경로로 HTTP 확인.
+- Docker 반영: 이미지 **재빌드** 후 컨테이너 재기동.
+
+## 3–4. 공통 원칙
+
+전문·예시는 루트에 두지 않음 ---> [`../_docs/CLAUDE.md`](../_docs/CLAUDE.md) · [`../_docs/AGENTS.md`](../_docs/AGENTS.md)
+
+**트레이드오프:** 속도보다 신중함.

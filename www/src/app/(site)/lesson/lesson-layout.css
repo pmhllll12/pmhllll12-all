@@ -1,0 +1,118 @@
+/* 사이드바 드로어/스크롤/요약 마커처럼 Tailwind 유틸리티로 표현하기 어려운 구조적 동작만 둔다. */
+
+.lesson-menu-btn {
+  display: none;
+}
+
+.lesson-menu-btn__bar {
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.lesson-shell--nav-open .lesson-menu-btn__bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.lesson-shell--nav-open .lesson-menu-btn__bar:nth-child(2) {
+  opacity: 0;
+}
+
+.lesson-shell--nav-open .lesson-menu-btn__bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.lesson-topbar__nav {
+  scrollbar-width: thin;
+}
+
+.lesson-drawer-backdrop {
+  display: none;
+}
+
+.lesson-sidebar {
+  position: sticky;
+  top: 80px;
+}
+
+.lesson-sidebar__details summary {
+  list-style: none;
+}
+
+.lesson-sidebar__details summary::-webkit-details-marker {
+  display: none;
+}
+
+.lesson-sidebar__summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #64748b;
+  border-bottom: 2px solid #64748b;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.2s ease;
+}
+
+.lesson-sidebar__details[open] .lesson-sidebar__summary::after {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+@media (max-width: 800px) {
+  .lesson-menu-btn {
+    display: inline-flex;
+  }
+
+  .lesson-topbar__nav {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .lesson-drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .lesson-shell--nav-open .lesson-drawer-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .lesson-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(300px, 88vw);
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    z-index: 120;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    border-top: none;
+    border-bottom: none;
+    border-left: none;
+    padding-top: max(20px, env(safe-area-inset-top, 0px));
+    padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .lesson-shell--nav-open .lesson-sidebar {
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 801px) {
+  .lesson-drawer-backdrop {
+    display: none !important;
+  }
+
+  .lesson-sidebar__close {
+    display: none !important;
+  }
+}

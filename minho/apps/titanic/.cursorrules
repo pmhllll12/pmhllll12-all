@@ -1,0 +1,35 @@
+# 에이전트 하네스 — 타이타닉 앱 (`minho/apps/titanic`)
+
+**필독:** [`_docs/CLAUDE.md`](_docs/CLAUDE.md) · [`../../CLAUDE.md`](../../CLAUDE.md) · [`../../../_docs/AGENTS.md`](../../../_docs/AGENTS.md)
+
+## 0. 앱 시블링
+
+- `minho/apps/titanic` 은 `minho/apps/` 아래 **형제 앱** 중 하나다.
+- 다른 앱(`soccer` 등) 코드를 import 하지 않는다. 공유는 `minho/core/`, `database.py` 수준만.
+
+## 1. 레이어 (헥사고날)
+
+| 레이어 | 경로 |
+|--------|------|
+| Inbound API | `adapter/inbound/api/V1/*_router.py` |
+| 스키마 | `adapter/inbound/api/schemas/` |
+| 유스케이스 | `app/use_cases/*_interactor.py` |
+| 포트 | `app/ports/input/`, `app/ports/output/` |
+| Outbound | `adapter/outbound/pg/`, `orm/`, `mappers/` |
+| DI | `dependencies/*_provider.py` |
+| 라우터 묶음 | `adapter/inbound/api/__init__.py` → `titanic_router` |
+
+라우터에 비즈니스 로직을 길게 쓰지 않고 **interactor**로 위임한다. (Gemini 채팅 등 예외는 문서화된 경우만 라우터·interactor 중 한 곳에 유지)
+
+## 2. API prefix
+
+- `titanic_router` prefix: **`/titanic`** (절대 `/api/titanic` 사용 금지 — 게이트웨이·Vite와 불일치 시 404).
+
+## 3. 검증
+
+- `cd minho` → `python -c "from main import app"`.
+- 스키마·라우터 이름 일치 (`SmithCaptainSchema`, `SmithChatRequest`, …).
+
+## 4. 공통 원칙
+
+---> [`../../../_docs/CLAUDE.md`](../../../_docs/CLAUDE.md)

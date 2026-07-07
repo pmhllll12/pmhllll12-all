@@ -1,0 +1,58 @@
+.home-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(60% 50% at 18% 22%, rgba(34, 211, 238, 0.22), transparent 60%),
+    radial-gradient(55% 45% at 82% 78%, rgba(56, 189, 248, 0.14), transparent 60%),
+    radial-gradient(80% 60% at 50% 110%, rgba(14, 165, 233, 0.18), transparent 70%),
+    linear-gradient(180deg, var(--color-bg-1) 0%, var(--color-bg-0) 100%);
+}
+
+.home-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.6) 0, transparent 1px),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.45) 0, transparent 1px),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0, transparent 1px),
+    radial-gradient(circle at 35% 70%, rgba(255, 255, 255, 0.35) 0, transparent 1px),
+    radial-gradient(circle at 55% 40%, rgba(255, 255, 255, 0.3) 0, transparent 1px),
+    radial-gradient(circle at 10% 85%, rgba(255, 255, 255, 0.35) 0, transparent 1px);
+  background-size:
+    600px 600px,
+    700px 700px,
+    500px 500px,
+    800px 800px,
+    900px 900px,
+    750px 750px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.home-grid {
+  grid-template-areas: "hero" "chat" "prediction" "sections";
+}
+
+@media (min-width: 1201px) {
+  .home-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, min(400px, 100%));
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "hero chat" "prediction chat" "sections chat";
+  }
+}
+
+.home-grid-hero {
+  grid-area: hero;
+}
+.home-grid-chat {
+  grid-area: chat;
+}
+.home-grid-prediction {
+  grid-area: prediction;
+}
+.home-grid-sections {
+  grid-area: sections;
+}

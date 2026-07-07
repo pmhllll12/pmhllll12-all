@@ -1,0 +1,114 @@
+# 하네스 설정 — 빌드 배포용이 아니라 린터/포매터/아키텍처 검증 전용.
+# 상세 배경: `_docs/architecture-star-topology.md`
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "TID"]
+
+# 상대 import 전면 금지: `from ..titanic import x` 같은 형태는 import-linter가
+# 점(.) 경로로 모듈을 추적하는 것을 우회하기 쉽다. 절대 import만 쓰면 어떤 앱이
+# 어떤 앱을 참조하는지 코드만 보고도, 도구로도 항상 같은 방식으로 보인다.
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ---------------------------------------------------------------------------
+# import-linter — 허브/스포크/온톨로지/클린 아키텍처 경계를 빌드 타임에 강제.
+# 실행: `lint-imports --config pyproject.toml` (minho/ 에서, PYTHONPATH에
+# minho, minho/apps, minho/core 포함 — main.py의 sys.path 구성과 동일해야 함)
+# ---------------------------------------------------------------------------
+[tool.importlinter]
+root_packages = [
+    "star_craft",
+    "titanic",
+    "soccer",
+    "social_network",
+    "matching",
+    "imitation_game",
+    "friday_13th",
+    "silicon_valley",
+    "inception",
+    "ontology",
+    "core",
+    "matrix",
+    "adapters",
+]
+
+# 1) 허브(star_craft)는 스포크를 알 수 있지만, 스포크는 허브를 모른다.
+#    "허브는 스포크를 알 수 있지만 스포크 간 직접 의존성은 금지"의 절반(허브→스포크 방향).
+[[tool.importlinter.contracts]]
+name = "허브(star_craft)는 스포크를 알지만, 스포크는 허브를 모른다"
+type = "forbidden"
+source_modules = [
+    "titanic",
+    "soccer",
+    "social_network",
+    "matching",
+    "imitation_game",
+    "friday_13th",
+    "silicon_valley",
+    "inception",
+]
+forbidden_modules = ["star_craft"]
+
+# 2) 스포크 간 직접 의존성 철저히 금지 (양방향). 현재 friday_13th가 titanic을
+#    직접 import하고 있어 이 contract는 처음 실행 시 FAIL 한다 — 별도로 고쳐야 함.
+[[tool.importlinter.contracts]]
+name = "스포크는 서로 직접 import 할 수 없다"
+type = "independence"
+modules = [
+    "titanic",
+    "soccer",
+    "social_network",
+    "matching",
+    "imitation_game",
+    "friday_13th",
+    "silicon_valley",
+    "inception",
+]
+
+# 3) 온톨로지(ontology)·공통 인프라(core/matrix/adapters)는 그래프 최하단.
+#    허브·스포크 누구나 이들을 참조할 수 있지만, 이들은 허브·스포크를 절대 모른다.
+[[tool.importlinter.contracts]]
+name = "온톨로지·공통 인프라는 허브/스포크를 모른다 (그래프 최하단)"
+type = "forbidden"
+source_modules = ["ontology", "core", "matrix", "adapters"]
+forbidden_modules = [
+    "star_craft",
+    "titanic",
+    "soccer",
+    "social_network",
+    "matching",
+    "imitation_game",
+    "friday_13th",
+    "silicon_valley",
+    "inception",
+]
+
+# 4) 모듈 내부 클린 아키텍처 계층: adapter → app(use case) → domain.
+#    domain은 아무것도 모르고, app은 domain만 알고, adapter는 둘 다 안다.
+#    soccer/matching은 아직 domain 계층이 없어 제외.
+#    titanic은 app(ports/use_cases)이 adapter의 schemas를 직접 참조하는 기존
+#    위반이 ~25곳 있어 일단 제외 — DTO를 app/dtos/로 옮기는 별도 작업 후 추가할 것.
+[[tool.importlinter.contracts]]
+name = "각 허브/스포크 내부 클린 아키텍처 계층 (domain ← app ← adapter)"
+type = "layers"
+layers = [
+    "adapter",
+    "app",
+    "domain",
+]
+containers = [
+    "star_craft",
+    "friday_13th",
+    "imitation_game",
+    "inception",
+    "silicon_valley",
+    "social_network",
+]

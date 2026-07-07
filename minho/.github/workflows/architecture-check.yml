@@ -1,0 +1,31 @@
+name: architecture-check
+
+# 스타 토폴로지(허브→스포크 단방향, 스포크 간 금지, 클린 아키텍처 계층)가
+# 깨진 PR을 머지 전에 막는다. 규칙 정의: pyproject.toml, 배경: _docs/architecture-star-topology.md
+# 이 파일은 minho(서브모듈, 별도 저장소 cloud.pmhllll12.api) 자체에 있어야 PR에서 실제로 돈다.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  import-boundaries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: install dev deps
+        run: pip install -r requirements-dev.txt
+
+      - name: lint-imports (star topology / ontology / clean architecture)
+        run: bash scripts/check_architecture.sh
+
+      - name: ruff check
+        run: ruff check .
+
+      - name: ruff format --check
+        run: ruff format --check .

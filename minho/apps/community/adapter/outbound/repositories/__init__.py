@@ -1,0 +1,1 @@
+"""Community PostgreSQL outbound adapters."""

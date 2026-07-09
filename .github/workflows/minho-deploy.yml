@@ -1,0 +1,65 @@
+name: minho-deploy
+
+# minho/ 변경이 main에 머지되면 Docker Hub(pmhllll12/minho-backend)로
+# 빌드/푸시하고, self-hosted 러너(운영 서버)에서 최신 이미지로 재기동한다.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "minho/**"
+  workflow_dispatch: {}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: minho
+          push: true
+          tags: |
+            pmhllll12/minho-backend:latest
+            pmhllll12/minho-backend:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest image
+        run: docker pull pmhllll12/minho-backend:latest
+
+      - name: Write .env
+        run: |
+          cat > /home/sigma/pmhllll12-all/minho/.env <<EOF
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          EOF
+          chmod 600 /home/sigma/pmhllll12-all/minho/.env
+
+      - name: Recreate container
+        run: |
+          docker rm -f minho-backend 2>/dev/null || true
+          docker run -d \
+            --name minho-backend \
+            --restart always \
+            -p 8000:8000 \
+            --env-file /home/sigma/pmhllll12-all/minho/.env \
+            -e API_HOST=0.0.0.0 \
+            pmhllll12/minho-backend:latest
+
+      - name: Health check
+        run: |
+          for i in $(seq 1 15); do
+            curl -sf http://localhost:8000/ping && exit 0
+            sleep 2
+          done
+          echo "healthcheck failed" >&2
+          exit 1

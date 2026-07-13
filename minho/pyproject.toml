@@ -32,7 +32,7 @@ root_packages = [
     "matching",
     "imitation_game",
     "friday_13th",
-    "silicon_valley",
+    "admin",
     "inception",
     "ontology",
     "core",
@@ -52,7 +52,7 @@ source_modules = [
     "matching",
     "imitation_game",
     "friday_13th",
-    "silicon_valley",
+    "admin",
     "inception",
 ]
 forbidden_modules = ["star_craft"]
@@ -69,7 +69,7 @@ modules = [
     "matching",
     "imitation_game",
     "friday_13th",
-    "silicon_valley",
+    "admin",
     "inception",
 ]
 
@@ -87,7 +87,7 @@ forbidden_modules = [
     "matching",
     "imitation_game",
     "friday_13th",
-    "silicon_valley",
+    "admin",
     "inception",
 ]
 
@@ -109,6 +109,6 @@ containers = [
     "friday_13th",
     "imitation_game",
     "inception",
-    "silicon_valley",
+    "admin",
     "social_network",
 ]

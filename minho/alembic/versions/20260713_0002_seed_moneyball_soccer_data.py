@@ -1,4 +1,4 @@
-"""stadium / team / schedule / player 시드 데이터 적재 (moneyball 축구 데이터셋).
+"""moneyball_stadiums / moneyball_teams / moneyball_schedules / moneyball_players 시드 데이터 적재.
 
 `apps/moneyball/resources/soccer_seed_data.sql`의 INSERT 문을 그대로 실행한다.
 이미 데이터가 있으면(재실행·다운그레이드 후 재적용 등) 건너뛴다.
@@ -27,7 +27,7 @@ _SEED_FILE = _MONEYBALL_APP_ROOT / "resources" / "soccer_seed_data.sql"
 
 def upgrade() -> None:
     bind = op.get_bind()
-    already_seeded = bind.execute(sa.text("SELECT count(*) FROM stadium")).scalar_one()
+    already_seeded = bind.execute(sa.text("SELECT count(*) FROM moneyball_stadiums")).scalar_one()
     if already_seeded:
         return
 
@@ -43,5 +43,10 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     bind = op.get_bind()
-    for table in ("schedule", "player", "team", "stadium"):
+    for table in (
+        "moneyball_schedules",
+        "moneyball_players",
+        "moneyball_teams",
+        "moneyball_stadiums",
+    ):
         bind.execute(sa.text(f"DELETE FROM {table}"))

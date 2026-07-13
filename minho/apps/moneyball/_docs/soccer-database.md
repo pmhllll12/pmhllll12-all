@@ -50,6 +50,7 @@ f.write(markdown_content)
 
 ```
 
+
 제시해주신 ERD를 기반으로, 우분투 24 환경에서 pgvector를 사용하는 PostgreSQL 데이터베이스를 Alembic으로 관리하기 위한 클로드(Claude)용 프롬프트를 MD 파일로 작성했습니다.
 
 작성된 파일은 아래에서 확인하실 수 있습니다.

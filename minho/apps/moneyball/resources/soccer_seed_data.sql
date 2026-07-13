@@ -1,8 +1,8 @@
 -- 실행 순서 2
 
 
-INSERT INTO STADIUM (
-    stadium_id, stadium_name, hometeam_id, seat_count, address, ddd, tel
+INSERT INTO moneyball_stadiums (
+    stadium_id, statdium_name, hometeam_id, seat_count, address, ddd, tel
 ) VALUES
     ('D03', '전주월드컵경기장', 'K05', 28000, '전북 전주시 덕진구 반월동 763-1', '063', '273-1763'),
     ('B02', '성남종합운동장', 'K08', 27000, '경기도 성남시 분당구 야탑동 486', '031', '753-3956'),
@@ -31,7 +31,7 @@ COMMIT;
 
 
 
-INSERT INTO team (team_id, region_name, team_name, e_team_name, orig_yyyy, stadium_id, zip_code1, zip_code2, address, ddd, tel, fax, homepage, owner) VALUES
+INSERT INTO moneyball_teams (team_id, region_name, team_name, e_team_name, orig_yyyy, stadium_id, zip_code1, zip_code2, address, ddd, tel, fax, homepage, owner) VALUES
 ('K05','전북','현대모터스','CHUNBUK  HYUNDAI MOTORS  FC','1995','D03','560','190',
 '전북 전주시 덕진구 반월동 763-1  전주월드컵경기장  내','063','273-1763','273-1762','http://www.hyundai-motorsfc.com', NULL),
 ('K08','성남','일화천마','SEONGNAM  ILHWA CHUNMA FC','1988','B02','462','130',
@@ -67,7 +67,7 @@ INSERT INTO team (team_id, region_name, team_name, e_team_name, orig_yyyy, stadi
 -- 실행 순서 4 - 1
 
 
-INSERT INTO player (player_id, player_name, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight, team_id) VALUES
+INSERT INTO moneyball_players (player_id, player_name, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight, team_id) VALUES
 ('2009175', '우르모브', NULL, NULL, '2009', 'DF', 4, '유고', '1987-08-30'::date, 1, 180, 70, 'K06'),
 ('2007188', '윤희준', NULL, NULL, '2005', 'DF', 15, NULL, '1982-11-01'::date, 1, 180, 74, 'K06'),
 ('2012073', '김규호', NULL, NULL, '2011', 'DF', 23, NULL, '1989-07-13'::date, 1, 177, 72, 'K06'),
@@ -107,7 +107,7 @@ INSERT INTO player (player_id, player_name, e_player_name, nickname, join_yyyy, 
 
 -- 실행 순서 4 - 2
 
-INSERT INTO player (player_id, player_name, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight, team_id) VALUES
+INSERT INTO moneyball_players (player_id, player_name, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight, team_id) VALUES
 ('2012054', '남현우', NULL, NULL, NULL, 'GK', 31, NULL, '1989-04-20'::date, 2, 180, 72, 'K04'),
 ('2008499', '김충호', NULL, NULL, NULL, 'GK', 60, NULL, '1978-07-04'::date, 2, 185, 83, 'K04'),
 ('2011021', '이현', NULL, NULL, NULL, 'GK', 1, NULL, '1988-11-07'::date, 2, 192, 85, 'K04'),
@@ -160,7 +160,7 @@ INSERT INTO player (player_id, player_name, e_player_name, nickname, join_yyyy, 
 -- 실행 순서 4 - 3
 
 
-INSERT INTO player (player_id, player_name, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight, team_id) VALUES
+INSERT INTO moneyball_players (player_id, player_name, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight, team_id) VALUES
 ('2000011', '정호곤', NULL, NULL, '2010', 'DF', NULL, NULL, '1971-03-26'::date, 1, 172, 77, 'K06'),
 ('2000012', '최경훈', NULL, NULL, NULL, 'DF', NULL, NULL, '1971-01-19'::date, 1, NULL, NULL, 'K06'),
 ('2000013', '정동훈', NULL, NULL, '2010', 'DF', NULL, NULL, '1975-06-11'::date, 1, 180, 88, 'K06'),
@@ -282,7 +282,7 @@ INSERT INTO player (player_id, player_name, e_player_name, nickname, join_yyyy, 
 -- 실행 순서 4 - 4
 
 
-INSERT INTO player (player_id, player_name, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight, team_id) VALUES
+INSERT INTO moneyball_players (player_id, player_name, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight, team_id) VALUES
 ('2009161', '세자르', NULL, NULL, NULL, 'FW', 17, NULL, '1983-12-09'::date, 1, 180, 78, 'K07'),
 ('2012032', '조병호', NULL, NULL, NULL, 'FW', 27, NULL, '1987-04-26'::date, 1, 177, 75, 'K07'),
 ('2011120', '찌코', NULL, NULL, NULL, 'FW', 27, NULL, '1985-01-26'::date, 1, 180, 67, 'K07'),
@@ -344,7 +344,7 @@ INSERT INTO player (player_id, player_name, e_player_name, nickname, join_yyyy, 
 -- 실행 순서 4 - 5
 
 
-INSERT INTO player (player_id, player_name, team_id, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight) VALUES
+INSERT INTO moneyball_players (player_id, player_name, team_id, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight) VALUES
 ('2000091', '이순호', 'K03', 'LEE, SOONHO', '', NULL, 'DF', NULL, NULL, '1972-01-10'::date, 1, NULL, NULL),
 ('2000092', '유동관', 'K03', 'YOU, DONGKWAN', '', NULL, 'DF', NULL, NULL, '1973-05-12'::date, 1, NULL, NULL),
 ('2000093', '박기동', 'K03', 'PARK, GIDONG', '', NULL, 'DF', NULL, NULL, '1971-05-13'::date, 1, NULL, NULL),
@@ -417,7 +417,7 @@ INSERT INTO player (player_id, player_name, team_id, e_player_name, nickname, jo
 
 -- 실행 순서 4 - 6
 
-INSERT INTO player (player_id, player_name, team_id, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight) VALUES
+INSERT INTO moneyball_players (player_id, player_name, team_id, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight) VALUES
 ('2011082', '권정혁', 'K01', 'KWON, JUNGHYUK', NULL, '2011', 'GK', 1, NULL, '1988-08-02'::date, 1, 195, 80),
 ('2009070', '최창주', 'K01', 'CHOI, CHANGZOO', NULL, '2009', 'GK', 40, NULL, '1982-09-30'::date, 1, 187, 86),
 ('2007020', '서동명', 'K01', 'SEO, DONGMYUNG', NULL, '2012', 'GK', 21, NULL, '1984-05-04'::date, 1, 196, 94),
@@ -533,7 +533,7 @@ INSERT INTO player (player_id, player_name, team_id, e_player_name, nickname, jo
 -- 실행 순서 4 - 7
 
 
-INSERT INTO player (player_id, player_name, team_id, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight) VALUES
+INSERT INTO moneyball_players (player_id, player_name, team_id, e_player_name, nickname, join_yyyy, position, back_no, nation, birth_date, solar, height, weight) VALUES
 ('2000041', '정호', 'K02', 'JEONG, HO', NULL, NULL, 'DF', NULL, NULL, '1974-11-24'::date, 1, NULL, NULL),
 ('2000042', '왕선재', 'K02', 'WANG, SUNJAE', NULL, NULL, 'DF', NULL, NULL, '1979-03-16'::date, 1, NULL, NULL),
 ('2000043', '코샤', 'K02', 'Marco Antonio Alvarez Ferreira', NULL, NULL, 'DF', NULL, '브라질', '1970-07-20'::date, 1, NULL, NULL),
@@ -583,7 +583,7 @@ INSERT INTO player (player_id, player_name, team_id, e_player_name, nickname, jo
 
 -- 실행 순서 5 - 1
 
-INSERT INTO schedule (stadium_id, sche_date, gubun, hometeam_id, awayteam_id, home_score, away_score) VALUES
+INSERT INTO moneyball_schedules (stadium_id, sche_date, gubun, hometeam_id, awayteam_id, home_score, away_score) VALUES
 ('D01', '2012-09-11', 'False'::VARCHAR, 'K07', 'K05', NULL, NULL),
 ('B05', '2012-09-11', 'False'::VARCHAR, 'K09', 'K01', NULL, NULL),
 ('B04', '2012-09-11', 'False'::VARCHAR, 'K02', 'K08', NULL, NULL),
@@ -744,7 +744,7 @@ INSERT INTO schedule (stadium_id, sche_date, gubun, hometeam_id, awayteam_id, ho
 -- 실행 순서 5 - 2
 
 
-INSERT INTO schedule (stadium_id, sche_date, gubun, hometeam_id, awayteam_id, home_score, away_score)
+INSERT INTO moneyball_schedules (stadium_id, sche_date, gubun, hometeam_id, awayteam_id, home_score, away_score)
 VALUES
 ('D03','2012-08-04','Y','K05','K04',2,1),
 ('B01','2012-08-11','Y','K04','K02',0,2),

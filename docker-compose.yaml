@@ -1,4 +1,4 @@
-# 브라우저는 http://localhost:3000 만 사용 (gateway → backend / frontend)
+# 프론트엔드(www)는 docker 배포 대상이 아님. backend는 http://localhost:8000 으로 직접 접근
 services:
   backend:
     build:
@@ -19,30 +19,6 @@ services:
       - pgvector
       - neo4j
       - redis
-    restart: always
-
-  # Next.js (next start) — 호스트 포트 없음. 컨테이너 내부 0.0.0.0:3000 리슨
-  frontend:
-    build:
-      context: ./www
-    expose:
-      - "3000"
-    env_file:
-      - path: ./www/.env.local
-        required: false
-    restart: always
-    depends_on:
-      - backend
-
-  gateway:
-    image: nginx:1.27-alpine
-    ports:
-      - "3000:80"
-    volumes:
-      - ./docker/gateway.default.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - frontend
-      - backend
     restart: always
 
   n8n:

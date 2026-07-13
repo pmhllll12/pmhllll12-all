@@ -164,6 +164,12 @@ async def create_all_tables() -> None:
         raise RuntimeError("DATABASE_URL 이 없거나 엔진 초기화에 실패했습니다.")
 
     from community.adapter.outbound.orm import juso_contact_orm, received_email_orm  # noqa: F401
+    from moneyball.adapter.outbound.orm import (
+        player_orm,  # noqa: F401
+        schedule_orm,  # noqa: F401
+        stadium_orm,  # noqa: F401
+        team_orm,  # noqa: F401
+    )
     from ontology.adapter.outbound.orm import vision_orm  # noqa: F401
     from secom.app.models import user_model  # noqa: F401
     from titanic.adapter.outbound.orm import (

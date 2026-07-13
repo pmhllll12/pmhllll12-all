@@ -34,6 +34,7 @@ root_packages = [
     "friday_13th",
     "admin",
     "inception",
+    "moneyball",
     "ontology",
     "core",
     "matrix",
@@ -54,6 +55,7 @@ source_modules = [
     "friday_13th",
     "admin",
     "inception",
+    "moneyball",
 ]
 forbidden_modules = ["star_craft"]
 
@@ -71,6 +73,7 @@ modules = [
     "friday_13th",
     "admin",
     "inception",
+    "moneyball",
 ]
 
 # 3) 온톨로지(ontology)·공통 인프라(core/matrix/adapters)는 그래프 최하단.
@@ -89,6 +92,7 @@ forbidden_modules = [
     "friday_13th",
     "admin",
     "inception",
+    "moneyball",
 ]
 
 # 4) 모듈 내부 클린 아키텍처 계층: adapter → app(use case) → domain.

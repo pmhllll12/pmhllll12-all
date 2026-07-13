@@ -3,11 +3,11 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime
 
-from vision.app.dtos.vision_dto import AnalyzeImageCommand, StoredImage
-from vision.app.ports.output.image_captioning_port import ImageCaptioningPort
-from vision.app.ports.output.image_storage_port import ImageStoragePort
-from vision.app.ports.output.vision_port import VisionPort
-from vision.app.use_cases.vision_interactor import VisionInteractor
+from ontology.app.dtos.vision_dto import AnalyzeImageCommand, StoredImage
+from ontology.app.ports.output.image_captioning_port import ImageCaptioningPort
+from ontology.app.ports.output.image_storage_port import ImageStoragePort
+from ontology.app.ports.output.vision_port import VisionPort
+from ontology.app.use_cases.vision_interactor import VisionInteractor
 
 
 class _StubCaptioner(ImageCaptioningPort):

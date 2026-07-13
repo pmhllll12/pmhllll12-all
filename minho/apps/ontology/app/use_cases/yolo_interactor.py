@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 
 from ultralytics import YOLO
-from vision.app.dtos.face_training_dto import TrainFaceRecognizerCommand, TrainFaceRecognizerResult
-from vision.app.ports.input.face_training_use_case import FaceTrainingUseCase
-from vision.app.ports.output.yolo_port import YoloDatasetPort
+from ontology.app.dtos.face_training_dto import TrainFaceRecognizerCommand, TrainFaceRecognizerResult
+from ontology.app.ports.input.face_training_use_case import FaceTrainingUseCase
+from ontology.app.ports.output.yolo_port import YoloDatasetPort
 
 logger = logging.getLogger(__name__)
 

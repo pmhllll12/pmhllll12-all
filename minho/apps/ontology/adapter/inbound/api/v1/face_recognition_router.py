@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from vision.adapter.inbound.api.schemas.face_recognition_schemas import PredictFaceResponse
-from vision.app.dtos.face_recognition_dto import PredictFaceCommand
-from vision.app.ports.input.face_recognition_use_case import FaceRecognitionUseCase
-from vision.dependencies.face_recognition_provider import get_face_recognition_use_case
+from ontology.adapter.inbound.api.schema.face_recognition_schemas import PredictFaceResponse
+from ontology.app.dtos.face_recognition_dto import PredictFaceCommand
+from ontology.app.ports.input.face_recognition_use_case import FaceRecognitionUseCase
+from ontology.dependencies.face_recognition_provider import get_face_recognition_use_case
 
 face_recognition_router = APIRouter(tags=["vision"])
 

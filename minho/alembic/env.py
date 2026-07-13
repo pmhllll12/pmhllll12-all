@@ -26,11 +26,11 @@ load_dotenv(_ROOT / ".env")
 
 # 메타데이터에 ORM 테이블 등록
 from community.adapter.outbound.orm import received_email_orm  # noqa: E402, F401
+from ontology.adapter.outbound.orm import vision_orm  # noqa: E402, F401
 from titanic.adapter.outbound.orm import (
     booking_orm,  # noqa: E402, F401
     passenger_orm,  # noqa: E402, F401
 )
-from vision.adapter.outbound.orm import vision_orm  # noqa: E402, F401
 
 from database import (
     Base,  # noqa: E402

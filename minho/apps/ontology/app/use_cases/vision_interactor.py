@@ -3,16 +3,16 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 
-from vision.app.dtos.vision_dto import (
+from ontology.app.dtos.vision_dto import (
     AnalyzedImageLog,
     AnalyzeImageCommand,
     AnalyzeImageResult,
 )
-from vision.app.ports.input.vision_use_case import VisionUseCase
-from vision.app.ports.output.image_captioning_port import ImageCaptioningPort
-from vision.app.ports.output.image_storage_port import ImageStoragePort
-from vision.app.ports.output.vision_port import VisionPort
-from vision.domain.analyzed_image import AnalyzedImage
+from ontology.app.ports.input.vision_use_case import VisionUseCase
+from ontology.app.ports.output.image_captioning_port import ImageCaptioningPort
+from ontology.app.ports.output.image_storage_port import ImageStoragePort
+from ontology.app.ports.output.vision_port import VisionPort
+from ontology.domain.analyzed_image import AnalyzedImage
 
 logger = logging.getLogger(__name__)
 

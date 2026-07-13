@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from vision.app.dtos.face_recognition_dto import PredictFaceCommand, PredictFaceResult
+from ontology.app.dtos.face_recognition_dto import PredictFaceCommand, PredictFaceResult
 
 
 class FaceRecognitionUseCase(ABC):

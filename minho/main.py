@@ -48,6 +48,7 @@ from adapters.weather_adapter import fetch_seoul_weather
 from community.adapter.inbound.api import community_router
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from ontology.adapter.inbound.api import vision_router
 from pydantic import BaseModel, ConfigDict, Field
 from silicon_valley.adapter.inbound.api import silicon_valley_router
 from silicon_valley.adapter.inbound.mcp.piper_bighetti_hr_tools import mcp as bighetti_mcp
@@ -59,7 +60,6 @@ from silicon_valley.dependencies.providers import get_n8n_client
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from titanic.adapter.inbound.api import titanic_router
-from vision.adapter.inbound.api import vision_router
 
 from core.matrix.vault_keymaker_secret_manager import (
     MissingApiKeyError,

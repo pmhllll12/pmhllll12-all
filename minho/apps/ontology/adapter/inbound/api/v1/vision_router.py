@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from vision.adapter.inbound.api.schemas.vision_schemas import (
+from ontology.adapter.inbound.api.schema.vision_schemas import (
     AnalyzedImageLogEntry,
     AnalyzeImageResponse,
 )
-from vision.app.dtos.vision_dto import AnalyzeImageCommand
-from vision.app.ports.input.vision_use_case import VisionUseCase
-from vision.dependencies.vision_provider import get_vision_use_case
+from ontology.app.dtos.vision_dto import AnalyzeImageCommand
+from ontology.app.ports.input.vision_use_case import VisionUseCase
+from ontology.dependencies.vision_provider import get_vision_use_case
 
 from core.matrix.vault_keymaker_secret_manager import MissingApiKeyError
 

@@ -3,13 +3,13 @@ from __future__ import annotations
 import logging
 
 from ultralytics import YOLO
-from vision.app.dtos.face_detection_dto import (
+from ontology.app.dtos.face_detection_dto import (
     DetectFacesCommand,
     DetectFacesResult,
     FaceBoundingBox,
 )
-from vision.app.ports.input.face_detection_use_case import FaceDetectionUseCase
-from vision.app.ports.output.face_detection_model_port import FaceDetectionModelPort
+from ontology.app.ports.input.face_detection_use_case import FaceDetectionUseCase
+from ontology.app.ports.output.face_detection_model_port import FaceDetectionModelPort
 
 logger = logging.getLogger(__name__)
 

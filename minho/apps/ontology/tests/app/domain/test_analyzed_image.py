@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import pytest
-from vision.domain.analyzed_image import AnalyzedImage
+from ontology.domain.analyzed_image import AnalyzedImage
 
 
 def test_valid_analyzed_image():

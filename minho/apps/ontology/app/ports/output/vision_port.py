@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from vision.app.dtos.vision_dto import StoredImage
+from ontology.app.dtos.vision_dto import StoredImage
 
 
 class VisionPort(ABC):

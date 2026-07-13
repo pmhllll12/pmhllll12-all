@@ -6,9 +6,9 @@ import logging
 
 from PIL import Image
 from ultralytics import YOLO
-from vision.app.dtos.face_recognition_dto import PredictFaceCommand, PredictFaceResult
-from vision.app.ports.input.face_recognition_use_case import FaceRecognitionUseCase
-from vision.app.ports.output.face_recognition_model_port import FaceRecognitionModelPort
+from ontology.app.dtos.face_recognition_dto import PredictFaceCommand, PredictFaceResult
+from ontology.app.ports.input.face_recognition_use_case import FaceRecognitionUseCase
+from ontology.app.ports.output.face_recognition_model_port import FaceRecognitionModelPort
 
 logger = logging.getLogger(__name__)
 

@@ -60,3 +60,19 @@ f.write(markdown_content)
 이 프롬프트에는 카파시의 하네스 원칙을 적용하여, 환경 설정부터 명확한 모델링, pgvector 확장 활성화, 외래 키 제약 조건 및 관계 설정까지 상세하게 작업 지시를 내리도록 구성했습니다. 클로드에게 이 내용을 그대로 전달하여 작업을 시작하시면 됩니다.
 
 ```
+
+---
+
+## 4. 현재 스키마 (구현 완료) — RAG용 embedding 컬럼
+
+위 프롬프트로 생성된 ORM(`adapter/outbound/orm/*.py`)과 Alembic 마이그레이션
+(`minho/alembic/versions/20260713_0001_create_soccer_tables.py`)에는 `moneyball_players`
+테이블에 pgvector `embedding` 컬럼이 이미 반영되어 있다.
+
+| 테이블 | 컬럼 | 타입 | 설명 |
+|---|---|---|---|
+| `moneyball_players` | `embedding` | `vector(768)`, nullable | 선수 프로필(이름·포지션·국적 등) 기반 RAG 유사도 검색용. `EMBEDDING_DIM = 768`은 `community` 앱과 동일 규격. 값을 채우는 임베딩 파이프라인은 아직 없음 — 컬럼 구조만 미리 준비된 상태 |
+
+- `stadium` / `team` / `schedule` 테이블에는 embedding 컬럼이 없다. RAG 대상은 현재 `player` 한 테이블로 한정.
+- 마이그레이션은 `CREATE EXTENSION IF NOT EXISTS vector` 를 `upgrade()` 최상단에서 실행해 pgvector 확장을 보장한다.
+- 임베딩을 채우려면: 선수 텍스트 필드(예: `player_name` + `position` + `nation` 조합)를 임베딩 모델에 통과시켜 `moneyball_players.embedding` 을 UPDATE 하면 되고, 스키마 변경은 필요 없다.

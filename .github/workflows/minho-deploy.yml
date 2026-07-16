@@ -41,6 +41,7 @@ jobs:
           GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
           OPENWEATHER_API_KEY=${{ secrets.OPENWEATHER_API_KEY }}
           DATABASE_URL=${{ secrets.DATABASE_URL }}
+          REDIS_URL=redis://redis:6379/0
           EOF
           chmod 600 /home/sigma/pmhllll12-all/minho/.env
 
@@ -50,6 +51,7 @@ jobs:
           docker run -d \
             --name minho-backend \
             --restart always \
+            --network pmhllll12-all_default \
             -p 8000:8000 \
             --env-file /home/sigma/pmhllll12-all/minho/.env \
             -e API_HOST=0.0.0.0 \

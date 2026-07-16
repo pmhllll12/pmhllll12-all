@@ -55,7 +55,7 @@ from admin.dependencies.providers import get_n8n_client
 from community.adapter.inbound.api import community_router
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from ontology.adapter.inbound.api import vision_router
+from ontology.adapter.inbound.api import crawler_router, vision_router
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -217,6 +217,7 @@ app.include_router(titanic_router)
 app.include_router(silicon_valley_router)
 app.include_router(community_router)
 app.include_router(vision_router)
+app.include_router(crawler_router)
 
 for _mcp_prefix, _mcp_server, _mcp_http_app in _SILICON_VALLEY_MCP_SERVERS:
     app.mount(_mcp_prefix, _mcp_http_app)

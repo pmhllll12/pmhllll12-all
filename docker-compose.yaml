@@ -15,6 +15,7 @@ services:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@pgvector:5432/${POSTGRES_DB:-neondb}?sslmode=disable
       OLLAMA_HOST: http://host.docker.internal:11434
       N8N_COMMUNITY_EMAIL_WEBHOOK_URL: http://n8n:5678/webhook/community-email
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       - pgvector
       - neo4j

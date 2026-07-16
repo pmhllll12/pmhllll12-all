@@ -230,6 +230,13 @@ export default function LessonLayout({
               >
                 축구마스터
               </Link>
+              <Link
+                href="/rag-system/crawler"
+                className={sublinkClass(pathname === "/rag-system/crawler")}
+                onClick={closeMenu}
+              >
+                크롤러/스크래퍼
+              </Link>
             </div>
           </details>
         </aside>

@@ -218,6 +218,20 @@ export default function LessonLayout({
               </Link>
             </div>
           </details>
+          <details className="lesson-sidebar__details m-0 border-0">
+            <summary className="lesson-sidebar__summary cursor-pointer text-base font-extrabold text-[#0f172a] py-[10px_0_8px] flex items-center justify-between select-none">
+              RAG
+            </summary>
+            <div className="flex flex-col gap-1 py-1 pb-2 pl-3 ml-1.5 border-l-2 border-[#e2e8f0]">
+              <Link
+                href="/rag-system/moneyball"
+                className={sublinkClass(pathname === "/rag-system/moneyball")}
+                onClick={closeMenu}
+              >
+                축구마스터
+              </Link>
+            </div>
+          </details>
         </aside>
         <div className="min-w-0 pt-1 pl-0 800:pl-[clamp(12px,2vw,28px)]">
           {children}

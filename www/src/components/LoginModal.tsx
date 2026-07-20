@@ -44,6 +44,54 @@ function getSignupUrl(): string {
   return "/signup";
 }
 
+/** 구글 로그인 시작 URL — backend가 구글 인증 후 현재 origin으로 되돌려 보낸다. */
+function getGoogleLoginUrl(): string {
+  const base = getApiBase();
+  const returnTo = encodeURIComponent(window.location.origin);
+  return `${base}/auth/google/login?return_to=${returnTo}`;
+}
+
+type SocialProvider = {
+  id: string;
+  label: string;
+  className: string;
+  enabled: boolean;
+};
+
+const SOCIAL_PROVIDERS: SocialProvider[] = [
+  {
+    id: "google",
+    label: "구글로 로그인",
+    className: "bg-white text-[#1f1f1f] border border-[rgba(0,0,0,0.1)] hover:bg-[#f5f5f5]",
+    enabled: true,
+  },
+  {
+    id: "naver",
+    label: "네이버 아이디로 로그인",
+    className: "bg-[#03c75a] text-white border-none hover:bg-[#02b350]",
+    enabled: false,
+  },
+  {
+    id: "kakao",
+    label: "카카오계정으로 로그인",
+    className: "bg-[#fee500] text-[#191600] border-none hover:bg-[#fada00]",
+    enabled: false,
+  },
+  {
+    id: "apple",
+    label: "Apple로 로그인",
+    className: "bg-black text-white border-none hover:bg-[#1a1a1a]",
+    enabled: false,
+  },
+  {
+    id: "instagram",
+    label: "Instagram으로 로그인",
+    className:
+      "text-white border-none bg-[linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)] hover:opacity-90",
+    enabled: false,
+  },
+];
+
 function sleep(ms: number): Promise<void> {
   return new Promise((r) => window.setTimeout(r, ms));
 }
@@ -182,6 +230,17 @@ export default function LoginModal({
   const patch = useCallback((p: Partial<LoginModalFormState>) => {
     setState((prev) => ({ ...prev, ...p }));
   }, []);
+
+  const handleSocialClick = useCallback(
+    (provider: SocialProvider) => {
+      if (provider.id === "google") {
+        window.location.href = getGoogleLoginUrl();
+        return;
+      }
+      patch({ error: "준비 중인 로그인 방식입니다." });
+    },
+    [patch],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -509,6 +568,25 @@ export default function LoginModal({
               ? "회원가입 시 POST /signup 으로 전송됩니다. 터미널에서 수신 로그를 확인하세요."
               : "데모 로그인입니다."}
           </p>
+          {!isSignup ? (
+            <div className="mt-5 pt-5 border-t border-[rgba(148,163,184,0.15)]">
+              <p className="mb-3 text-xs font-bold tracking-[0.04em] text-[rgba(148,163,184,0.85)] text-center">
+                간편 로그인
+              </p>
+              <div className="flex flex-col gap-2">
+                {SOCIAL_PROVIDERS.map((provider) => (
+                  <button
+                    key={provider.id}
+                    type="button"
+                    className={`w-full p-[12px_16px] rounded-full font-bold text-sm cursor-pointer transition ${provider.className}`}
+                    onClick={() => handleSocialClick(provider)}
+                  >
+                    {provider.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </form>
       </div>
     </div>,

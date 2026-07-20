@@ -4,6 +4,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from urllib.parse import quote
 
 # `backend/` 에서 실행: `main` 모듈은 이 파일, `adapters`·`titanic` 등은 `apps/` 에 있음
 _BACKEND_ROOT = Path(__file__).resolve().parent
@@ -55,12 +56,22 @@ from admin.dependencies.providers import get_n8n_client
 from community.adapter.inbound.api import community_router
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from ontology.adapter.inbound.api import crawler_router, vision_router
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from titanic.adapter.inbound.api import titanic_router
 
+from core.matrix.google_oauth_client import (
+    GoogleOAuthNotConfiguredError,
+    build_authorize_url,
+    exchange_code_for_tokens,
+    fetch_userinfo,
+    resolve_return_origin,
+    sign_state,
+    verify_state,
+)
 from core.matrix.vault_keymaker_secret_manager import (
     MissingApiKeyError,
     format_gemini_error,
@@ -320,6 +331,54 @@ async def signup(
         ok=True,
         message="회원가입 요청이 접수되었습니다.",
         email=email,
+    )
+
+
+@app.get("/auth/google/login")
+async def google_login(return_to: str | None = None) -> RedirectResponse:
+    """프런트 origin(return_to)을 서명해 구글 인증 화면으로 리다이렉트합니다."""
+    origin = resolve_return_origin(return_to)
+    try:
+        state = sign_state(origin)
+        return RedirectResponse(build_authorize_url(state))
+    except GoogleOAuthNotConfiguredError as exc:
+        logger.warning("[/auth/google/login] %s", exc)
+        return RedirectResponse(f"{origin}?oauth_login_error=not_configured")
+
+
+@app.get("/auth/google/callback")
+async def google_callback(
+    code: str | None = None,
+    state: str | None = None,
+    error: str | None = None,
+) -> RedirectResponse:
+    """구글이 code(또는 error)와 함께 돌아오면 검증 후 프런트로 되돌려 보냅니다."""
+    origin = resolve_return_origin(None)
+    if state:
+        verified_origin = verify_state(state)
+        if verified_origin:
+            origin = verified_origin
+
+    if error:
+        logger.info("[/auth/google/callback] 구글 인증 거부/취소 — error=%s", error)
+        return RedirectResponse(f"{origin}?oauth_login_error={error}")
+    if not code or not state or not verify_state(state):
+        return RedirectResponse(f"{origin}?oauth_login_error=invalid_state")
+
+    try:
+        tokens = await exchange_code_for_tokens(code)
+        userinfo = await fetch_userinfo(tokens["access_token"])
+    except GoogleOAuthNotConfiguredError as exc:
+        logger.warning("[/auth/google/callback] %s", exc)
+        return RedirectResponse(f"{origin}?oauth_login_error=not_configured")
+    except Exception:
+        logger.exception("[/auth/google/callback] 구글 토큰 교환/사용자 정보 조회 실패")
+        return RedirectResponse(f"{origin}?oauth_login_error=google_oauth_failed")
+
+    email = userinfo.get("email", "")
+    name = userinfo.get("name", "")
+    return RedirectResponse(
+        f"{origin}?oauth_login_email={quote(email)}&oauth_login_name={quote(name)}"
     )
 
 

@@ -59,6 +59,29 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const oauthEmail = params.get("oauth_login_email");
+    const oauthError = params.get("oauth_login_error");
+    if (!oauthEmail && !oauthError) return;
+
+    if (oauthEmail) {
+      try {
+        sessionStorage.setItem(SESSION_EMAIL_KEY, oauthEmail);
+      } catch {
+        /* ignore */
+      }
+      setUi((prev) => ({ ...prev, sessionEmail: oauthEmail }));
+    }
+
+    params.delete("oauth_login_email");
+    params.delete("oauth_login_name");
+    params.delete("oauth_login_error");
+    const query = params.toString();
+    const nextUrl = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
+    window.history.replaceState(null, "", nextUrl);
+  }, []);
+
+  useEffect(() => {
     const open = () => patch({ scheduleOpen: true });
     window.addEventListener(WC_OPEN_FULL_SCHEDULE, open);
     return () => window.removeEventListener(WC_OPEN_FULL_SCHEDULE, open);

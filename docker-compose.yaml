@@ -1,27 +1,6 @@
-# 프론트엔드(www)는 docker 배포 대상이 아님. backend는 http://localhost:8000 으로 직접 접근
+# 프론트엔드(www)와 backend는 docker 배포 대상이 아님. backend는 minho-deploy.yml(GH Actions)이
+# Docker Hub 이미지로 별도 배포하며, http://localhost:8000 으로 직접 접근한다.
 services:
-  backend:
-    build:
-      context: ./minho
-    ports:
-      - "8000:8000"
-    expose:
-      - "8000"
-    env_file:
-      - ./minho/.env
-    environment:
-      API_HOST: "0.0.0.0"
-      UVICORN_RELOAD: "0"
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@pgvector:5432/${POSTGRES_DB:-neondb}?sslmode=disable
-      OLLAMA_HOST: http://host.docker.internal:11434
-      N8N_COMMUNITY_EMAIL_WEBHOOK_URL: http://n8n:5678/webhook/community-email
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      - pgvector
-      - neo4j
-      - redis
-    restart: always
-
   n8n:
     image: docker.n8n.io/n8nio/n8n
     ports:
@@ -82,7 +61,6 @@ services:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
     depends_on:
       - n8n
-      - backend
     restart: always
 
 volumes:

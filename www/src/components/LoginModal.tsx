@@ -6,6 +6,7 @@ import {
   useId,
   useRef,
   useState,
+  type CSSProperties,
   type FormEvent,
   type ReactElement,
 } from "react";
@@ -78,43 +79,48 @@ function GoogleLogo() {
 type SocialProvider = {
   id: string;
   label: string;
-  className: string;
+  style: CSSProperties;
   enabled: boolean;
   icon?: () => ReactElement;
 };
 
+// 전역 CSS(globals.css `button { color: inherit }`)가 레이어 밖 규칙이라 Tailwind
+// text-color 유틸리티(레이어 안)보다 항상 우선한다 — 색은 className이 아니라
+// style로 강제해야 실제로 반영된다.
 const SOCIAL_PROVIDERS: SocialProvider[] = [
   {
     id: "google",
     label: "구글로 로그인",
-    className:
-      "bg-white text-[#1f1f1f] border border-[rgba(0,0,0,0.15)] hover:bg-[#f5f5f5] inline-flex items-center justify-center gap-2",
+    style: { backgroundColor: "#ffffff", color: "#1f1f1f", border: "1px solid rgba(0,0,0,0.15)" },
     enabled: true,
     icon: GoogleLogo,
   },
   {
     id: "naver",
     label: "네이버 아이디로 로그인",
-    className: "bg-[#03c75a] text-white border-none hover:bg-[#02b350]",
+    style: { backgroundColor: "#03c75a", color: "#ffffff", border: "none" },
     enabled: false,
   },
   {
     id: "kakao",
     label: "카카오계정으로 로그인",
-    className: "bg-[#fee500] text-[#191600] border-none hover:bg-[#fada00]",
+    style: { backgroundColor: "#fee500", color: "#191600", border: "none" },
     enabled: false,
   },
   {
     id: "apple",
     label: "Apple로 로그인",
-    className: "bg-black text-white border-none hover:bg-[#1a1a1a]",
+    style: { backgroundColor: "#000000", color: "#ffffff", border: "none" },
     enabled: false,
   },
   {
     id: "instagram",
     label: "Instagram으로 로그인",
-    className:
-      "text-white border-none bg-[linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)] hover:opacity-90",
+    style: {
+      background: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)",
+      color: "#ffffff",
+      border: "none",
+    },
     enabled: false,
   },
 ];
@@ -607,7 +613,8 @@ export default function LoginModal({
                     <button
                       key={provider.id}
                       type="button"
-                      className={`w-full p-[12px_16px] rounded-full font-bold text-sm cursor-pointer transition ${provider.className}`}
+                      className="w-full p-[12px_16px] rounded-full font-bold text-sm cursor-pointer transition hover:opacity-90 inline-flex items-center justify-center gap-2"
+                      style={provider.style}
                       onClick={() => handleSocialClick(provider)}
                     >
                       {Icon ? <Icon /> : null}

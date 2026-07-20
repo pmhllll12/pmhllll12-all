@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
       { source: "/signup", destination: `${API_ORIGIN}/signup` },
       { source: "/ping", destination: `${API_ORIGIN}/ping` },
       { source: "/db-check", destination: `${API_ORIGIN}/db-check` },
+      { source: "/auth/:path*", destination: `${API_ORIGIN}/auth/:path*` },
       { source: "/api/:path*", destination: `${API_ORIGIN}/api/:path*` },
       {
         source: "/google-gemini/:path*",

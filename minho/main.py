@@ -63,15 +63,10 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from titanic.adapter.inbound.api import titanic_router
 
-from core.matrix.google_oauth_client import (
-    GoogleOAuthNotConfiguredError,
-    build_authorize_url,
-    exchange_code_for_tokens,
-    fetch_userinfo,
-    resolve_return_origin,
-    sign_state,
-    verify_state,
-)
+import core.matrix.google_oauth_client as google_oauth_client
+import core.matrix.kakao_oauth_client as kakao_oauth_client
+import core.matrix.naver_oauth_client as naver_oauth_client
+from core.matrix.oauth_state import OAuthNotConfiguredError, resolve_return_origin, sign_state, verify_state
 from core.matrix.vault_keymaker_secret_manager import (
     MissingApiKeyError,
     format_gemini_error,
@@ -334,25 +329,25 @@ async def signup(
     )
 
 
-@app.get("/auth/google/login")
-async def google_login(return_to: str | None = None) -> RedirectResponse:
-    """프런트 origin(return_to)을 서명해 구글 인증 화면으로 리다이렉트합니다."""
+def _oauth_login_redirect(return_to: str | None, build_authorize_url, log_prefix: str) -> RedirectResponse:
+    """return_to를 서명해 각 provider의 인증 화면으로 리다이렉트합니다."""
     origin = resolve_return_origin(return_to)
     try:
         state = sign_state(origin)
         return RedirectResponse(build_authorize_url(state))
-    except GoogleOAuthNotConfiguredError as exc:
-        logger.warning("[/auth/google/login] %s", exc)
+    except OAuthNotConfiguredError as exc:
+        logger.warning("%s %s", log_prefix, exc)
         return RedirectResponse(f"{origin}?oauth_login_error=not_configured")
 
 
-@app.get("/auth/google/callback")
-async def google_callback(
-    code: str | None = None,
-    state: str | None = None,
-    error: str | None = None,
+async def _oauth_callback_redirect(
+    code: str | None,
+    state: str | None,
+    error: str | None,
+    log_prefix: str,
+    fetch_userinfo_via_code,
 ) -> RedirectResponse:
-    """구글이 code(또는 error)와 함께 돌아오면 검증 후 프런트로 되돌려 보냅니다."""
+    """provider가 code(또는 error)와 함께 돌아오면 검증 후 프런트로 되돌려 보냅니다."""
     origin = resolve_return_origin(None)
     if state:
         verified_origin = verify_state(state)
@@ -360,26 +355,73 @@ async def google_callback(
             origin = verified_origin
 
     if error:
-        logger.info("[/auth/google/callback] 구글 인증 거부/취소 — error=%s", error)
+        logger.info("%s 인증 거부/취소 — error=%s", log_prefix, error)
         return RedirectResponse(f"{origin}?oauth_login_error={error}")
     if not code or not state or not verify_state(state):
         return RedirectResponse(f"{origin}?oauth_login_error=invalid_state")
 
     try:
-        tokens = await exchange_code_for_tokens(code)
-        userinfo = await fetch_userinfo(tokens["access_token"])
-    except GoogleOAuthNotConfiguredError as exc:
-        logger.warning("[/auth/google/callback] %s", exc)
+        userinfo = await fetch_userinfo_via_code(code, state)
+    except OAuthNotConfiguredError as exc:
+        logger.warning("%s %s", log_prefix, exc)
         return RedirectResponse(f"{origin}?oauth_login_error=not_configured")
     except Exception:
-        logger.exception("[/auth/google/callback] 구글 토큰 교환/사용자 정보 조회 실패")
-        return RedirectResponse(f"{origin}?oauth_login_error=google_oauth_failed")
+        logger.exception("%s 토큰 교환/사용자 정보 조회 실패", log_prefix)
+        return RedirectResponse(f"{origin}?oauth_login_error=oauth_failed")
 
     email = userinfo.get("email", "")
     name = userinfo.get("name", "")
     return RedirectResponse(
         f"{origin}?oauth_login_email={quote(email)}&oauth_login_name={quote(name)}"
     )
+
+
+@app.get("/auth/google/login")
+async def google_login(return_to: str | None = None) -> RedirectResponse:
+    return _oauth_login_redirect(return_to, google_oauth_client.build_authorize_url, "[/auth/google/login]")
+
+
+@app.get("/auth/google/callback")
+async def google_callback(
+    code: str | None = None, state: str | None = None, error: str | None = None
+) -> RedirectResponse:
+    async def _fetch(code: str, _state: str) -> dict:
+        tokens = await google_oauth_client.exchange_code_for_tokens(code)
+        return await google_oauth_client.fetch_userinfo(tokens["access_token"])
+
+    return await _oauth_callback_redirect(code, state, error, "[/auth/google/callback]", _fetch)
+
+
+@app.get("/auth/naver/login")
+async def naver_login(return_to: str | None = None) -> RedirectResponse:
+    return _oauth_login_redirect(return_to, naver_oauth_client.build_authorize_url, "[/auth/naver/login]")
+
+
+@app.get("/auth/naver/callback")
+async def naver_callback(
+    code: str | None = None, state: str | None = None, error: str | None = None
+) -> RedirectResponse:
+    async def _fetch(code: str, state: str) -> dict:
+        tokens = await naver_oauth_client.exchange_code_for_tokens(code, state)
+        return await naver_oauth_client.fetch_userinfo(tokens["access_token"])
+
+    return await _oauth_callback_redirect(code, state, error, "[/auth/naver/callback]", _fetch)
+
+
+@app.get("/auth/kakao/login")
+async def kakao_login(return_to: str | None = None) -> RedirectResponse:
+    return _oauth_login_redirect(return_to, kakao_oauth_client.build_authorize_url, "[/auth/kakao/login]")
+
+
+@app.get("/auth/kakao/callback")
+async def kakao_callback(
+    code: str | None = None, state: str | None = None, error: str | None = None
+) -> RedirectResponse:
+    async def _fetch(code: str, _state: str) -> dict:
+        tokens = await kakao_oauth_client.exchange_code_for_tokens(code)
+        return await kakao_oauth_client.fetch_userinfo(tokens["access_token"])
+
+    return await _oauth_callback_redirect(code, state, error, "[/auth/kakao/callback]", _fetch)
 
 
 class ChatRequest(BaseModel):

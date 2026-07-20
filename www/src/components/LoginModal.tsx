@@ -46,11 +46,11 @@ function getSignupUrl(): string {
   return "/signup";
 }
 
-/** 구글 로그인 시작 URL — backend가 구글 인증 후 현재 origin으로 되돌려 보낸다. */
-function getGoogleLoginUrl(): string {
+/** 소셜 로그인 시작 URL — backend가 해당 provider 인증 후 현재 origin으로 되돌려 보낸다. */
+function getSocialLoginUrl(providerId: string): string {
   const base = getApiBase();
   const returnTo = encodeURIComponent(window.location.origin);
-  return `${base}/auth/google/login?return_to=${returnTo}`;
+  return `${base}/auth/${providerId}/login?return_to=${returnTo}`;
 }
 
 function GoogleLogo() {
@@ -99,13 +99,13 @@ const SOCIAL_PROVIDERS: SocialProvider[] = [
     id: "naver",
     label: "네이버 아이디로 로그인",
     style: { backgroundColor: "#03c75a", color: "#ffffff", border: "none" },
-    enabled: false,
+    enabled: true,
   },
   {
     id: "kakao",
     label: "카카오계정으로 로그인",
     style: { backgroundColor: "#fee500", color: "#191600", border: "none" },
-    enabled: false,
+    enabled: true,
   },
   {
     id: "apple",
@@ -266,8 +266,8 @@ export default function LoginModal({
 
   const handleSocialClick = useCallback(
     (provider: SocialProvider) => {
-      if (provider.id === "google") {
-        window.location.href = getGoogleLoginUrl();
+      if (provider.enabled) {
+        window.location.href = getSocialLoginUrl(provider.id);
         return;
       }
       patch({ error: "준비 중인 로그인 방식입니다." });

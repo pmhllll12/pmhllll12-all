@@ -58,6 +58,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from ontology.adapter.inbound.api import crawler_router, vision_router
+from ontology.adapter.inbound.mcp.image_classifier_tools import mcp as image_classifier_mcp
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -66,7 +67,12 @@ from titanic.adapter.inbound.api import titanic_router
 import core.matrix.google_oauth_client as google_oauth_client
 import core.matrix.kakao_oauth_client as kakao_oauth_client
 import core.matrix.naver_oauth_client as naver_oauth_client
-from core.matrix.oauth_state import OAuthNotConfiguredError, resolve_return_origin, sign_state, verify_state
+from core.matrix.oauth_state import (
+    OAuthNotConfiguredError,
+    resolve_return_origin,
+    sign_state,
+    verify_state,
+)
 from core.matrix.vault_keymaker_secret_manager import (
     MissingApiKeyError,
     format_gemini_error,
@@ -85,6 +91,14 @@ _SILICON_VALLEY_MCP_SERVERS = tuple(
         ("/mcp/dunn", dunn_mcp),
     )
 )
+
+# ontology 앱의 도구성 MCP 서버 (캐릭터 롤플레이가 아니라 실제 기능 tool)
+_ONTOLOGY_MCP_SERVERS = tuple(
+    (prefix, server, server.streamable_http_app())
+    for prefix, server in (("/mcp/classifier", image_classifier_mcp),)
+)
+
+_ALL_MCP_SERVERS = _SILICON_VALLEY_MCP_SERVERS + _ONTOLOGY_MCP_SERVERS
 
 try:
     from secom.app.controllers.user_controller import UserController, register_secom_routes
@@ -200,7 +214,7 @@ async def lifespan(app: FastAPI):
     )
     try:
         async with AsyncExitStack() as mcp_stack:
-            for _prefix, server, _http_app in _SILICON_VALLEY_MCP_SERVERS:
+            for _prefix, server, _http_app in _ALL_MCP_SERVERS:
                 await mcp_stack.enter_async_context(server.session_manager.run())
             yield
     finally:
@@ -225,7 +239,7 @@ app.include_router(community_router)
 app.include_router(vision_router)
 app.include_router(crawler_router)
 
-for _mcp_prefix, _mcp_server, _mcp_http_app in _SILICON_VALLEY_MCP_SERVERS:
+for _mcp_prefix, _mcp_server, _mcp_http_app in _ALL_MCP_SERVERS:
     app.mount(_mcp_prefix, _mcp_http_app)
 
 

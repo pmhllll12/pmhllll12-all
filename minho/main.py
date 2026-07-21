@@ -59,6 +59,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from ontology.adapter.inbound.api import crawler_router, vision_router
 from ontology.adapter.inbound.mcp.image_classifier_tools import mcp as image_classifier_mcp
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -230,6 +231,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 요청 수/에러율/레이턴시(핸들러별)를 Prometheus exposition format으로 /metrics 에 노출.
+Instrumentator().instrument(app).expose(app)
 
 register_secom_routes(app)
 

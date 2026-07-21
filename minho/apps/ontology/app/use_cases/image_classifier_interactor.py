@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import asyncio
+import io
 import logging
 import time
-from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
@@ -76,18 +77,15 @@ class ImageClassifierInteractor(ImageClassifierUseCase):
             self._labels = [info.index_to_description(i) for i in range(info.num_classes())]
         return self._labels
 
-    def _preprocess(self, image_path: str) -> np.ndarray:
-        path = Path(image_path)
-        if not path.is_file() or path.stat().st_size == 0:
-            raise InvalidImageError(f"이미지 파일이 비어있거나 존재하지 않습니다: {image_path}")
+    def _preprocess(self, content: bytes) -> np.ndarray:
+        if not content:
+            raise InvalidImageError("이미지 데이터가 비어있습니다.")
         try:
-            image = Image.open(path)
+            image = Image.open(io.BytesIO(content))
             image.load()
             image = image.convert("RGB")
         except (UnidentifiedImageError, OSError) as exc:
-            raise InvalidImageError(
-                f"이미지를 디코딩할 수 없습니다(손상된 파일): {image_path}"
-            ) from exc
+            raise InvalidImageError("이미지를 디코딩할 수 없습니다(손상된 파일입니다).") from exc
 
         transform = self._get_transform()
         tensor = transform(image).unsqueeze(0)  # (1, C, H, W)
@@ -99,9 +97,12 @@ class ImageClassifierInteractor(ImageClassifierUseCase):
         exp = np.exp(shifted)
         return exp / exp.sum()
 
-    def classify(self, command: ClassifyImageCommand) -> ClassifyImageResult:
+    async def classify(self, command: ClassifyImageCommand) -> ClassifyImageResult:
+        return await asyncio.to_thread(self._classify_sync, command)
+
+    def _classify_sync(self, command: ClassifyImageCommand) -> ClassifyImageResult:
         session = self._get_session()
-        input_tensor = self._preprocess(command.image_path)
+        input_tensor = self._preprocess(command.content)
 
         started = time.perf_counter()
         outputs = session.run(None, {self._input_name: input_tensor})
@@ -116,9 +117,9 @@ class ImageClassifierInteractor(ImageClassifierUseCase):
         uncertain = best.confidence < command.confidence_threshold
 
         logger.info(
-            "[ImageClassifierInteractor] classify image_path=%r label=%r confidence=%.4f "
+            "[ImageClassifierInteractor] classify filename=%r label=%r confidence=%.4f "
             "uncertain=%s elapsed_ms=%.1f provider=%s",
-            command.image_path,
+            command.filename,
             best.label,
             best.confidence,
             uncertain,

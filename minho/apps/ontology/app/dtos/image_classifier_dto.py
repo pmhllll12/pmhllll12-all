@@ -9,7 +9,8 @@ DEFAULT_CONFIDENCE_THRESHOLD = 0.5
 
 @dataclass(frozen=True)
 class ClassifyImageCommand:
-    image_path: str
+    content: bytes
+    filename: str = "unnamed"
     confidence_threshold: float = DEFAULT_CONFIDENCE_THRESHOLD
 
 

@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import sys
 from pathlib import Path
@@ -28,17 +29,19 @@ from ontology.app.use_cases.image_classifier_interactor import (  # noqa: E402
 )
 
 
-def main() -> int:
-    if len(sys.argv) != 2:
-        print(f"사용법: {sys.argv[0]} <이미지 경로>", file=sys.stderr)
-        return 2
+async def _run(image_path: str) -> int:
+    path = Path(image_path)
+    if not path.is_file():
+        print(f"오류: 파일이 존재하지 않습니다: {image_path}", file=sys.stderr)
+        return 1
+    content = path.read_bytes()
 
-    image_path = sys.argv[1]
     interactor = ImageClassifierInteractor(model_port=LocalImageClassifierModelAdapter())
-
     try:
-        result = interactor.classify(ClassifyImageCommand(image_path=image_path))
-    except (InvalidImageError, FileNotFoundError) as exc:
+        result = await interactor.classify(
+            ClassifyImageCommand(content=content, filename=path.name)
+        )
+    except InvalidImageError as exc:
         print(f"오류: {exc}", file=sys.stderr)
         return 1
 
@@ -51,6 +54,13 @@ def main() -> int:
     for i, item in enumerate(result.top5, start=1):
         print(f"  {i}. {item.label:<40s} {item.confidence:.4f}")
     return 0
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print(f"사용법: {sys.argv[0]} <이미지 경로>", file=sys.stderr)
+        return 2
+    return asyncio.run(_run(sys.argv[1]))
 
 
 if __name__ == "__main__":

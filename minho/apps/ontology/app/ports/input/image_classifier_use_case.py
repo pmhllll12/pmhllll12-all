@@ -7,5 +7,5 @@ from ontology.app.dtos.image_classifier_dto import ClassifyImageCommand, Classif
 
 class ImageClassifierUseCase(ABC):
     @abstractmethod
-    def classify(self, command: ClassifyImageCommand) -> ClassifyImageResult:
+    async def classify(self, command: ClassifyImageCommand) -> ClassifyImageResult:
         raise NotImplementedError

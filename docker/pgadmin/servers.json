@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "pgvector",
+      "Group": "Servers",
+      "Host": "pgvector",
+      "Port": 5432,
+      "MaintenanceDB": "neondb",
+      "Username": "postgres",
+      "SSLMode": "prefer",
+      "PassFile": "/pgpass/pgpass"
+    }
+  }
+}

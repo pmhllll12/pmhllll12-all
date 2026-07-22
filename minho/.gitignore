@@ -114,6 +114,9 @@ runs/
 apps/vision/resources/yolo_train/train/*/*
 apps/vision/resources/yolo_train/val/*/*
 
+# 크롤러 실행 결과(JsonlCrawlStorage 출력) — 재생성 가능한 로컬 데이터
+apps/ontology/resources/crawled/*.jsonl
+
 # =============================================================================
 # 기타 로컬/CI 캐시
 # =============================================================================

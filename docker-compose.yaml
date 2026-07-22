@@ -9,6 +9,9 @@ services:
       - "8000"
     env_file:
       - ./minho/.env
+      # JWT_PUBLIC_KEY만 별도 파일로 분리(검증부는 개인키를 몰라도 됨).
+      - path: ./minho/.env.backend
+        required: false
     environment:
       API_HOST: "0.0.0.0"
       UVICORN_RELOAD: "0"
@@ -18,6 +21,20 @@ services:
     depends_on:
       - pgvector
       - neo4j
+      - redis
+    restart: always
+
+  # 인증 게이트웨이 — JWT 발급 전용(auth-gateway-harness.md). 개인키(JWT_PRIVATE_KEY)는
+  # 이 컨테이너에만 존재. 호스트 포트 노출 없음 — 진입은 cloudflared 터널만.
+  auth:
+    build:
+      context: ./minho
+    command: uvicorn auth_main:app --host 0.0.0.0 --port 9000
+    expose:
+      - "9000"
+    env_file:
+      - ./minho/.env.auth
+    depends_on:
       - redis
     restart: always
 

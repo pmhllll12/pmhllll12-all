@@ -64,7 +64,7 @@ from community.adapter.inbound.api.v1.watcher_router import watcher_router
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-from ontology.adapter.inbound.api import crawler_router, vision_router
+from ontology.adapter.inbound.api import crawler_router, ontology_router, vision_router
 from ontology.adapter.inbound.mcp.image_classifier_tools import mcp as image_classifier_mcp
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, ConfigDict, Field
@@ -247,6 +247,7 @@ register_secom_routes(app)
 
 app.include_router(titanic_router)
 app.include_router(silicon_valley_router)
+app.include_router(ontology_router)
 
 # community_router를 apps/community에서 그대로 가져오지 않고 여기서 재구성한 이유:
 # juso(/api/community/juso)에만 RoleChecker(Role.USER) 보호를 예시로 적용하기

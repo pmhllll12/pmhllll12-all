@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from core.lol.t1_mid_faker_orchestrator import FAKER_MODEL, FakerOrchestrator
+from ontology.app.ports.input.ask_question_use_case import AskQuestionUseCase
 from ontology.app.ports.input.judge_use_case import JudgeUseCase
 from ontology.app.use_cases.faker_judge_interactor import FakerJudgeInteractor
+from ontology.app.use_cases.gemini_interactor import GeminiInteractor
+
+from core.lol.t1_mid_faker_orchestrator import FAKER_MODEL, FakerOrchestrator
+from core.matrix.vault_keymaker_secret_manager import keymaker
 
 _SPAM_JUDGE_SYSTEM_PROMPT = (
     "당신은 이메일 스팸 판별 전문가입니다. "
@@ -19,3 +23,8 @@ def get_judge_use_case() -> JudgeUseCase:
         system_prompt=_SPAM_JUDGE_SYSTEM_PROMPT,
     )
     return FakerJudgeInteractor(orchestrator=orchestrator)
+
+
+def get_ask_question_use_case() -> AskQuestionUseCase:
+    """질의응답용 Judge — Gemini 기반. API 키는 Keymaker가 관리해 주입한다."""
+    return GeminiInteractor(keymaker=keymaker)

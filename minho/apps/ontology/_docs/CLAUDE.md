@@ -83,6 +83,9 @@ system_prompt만 교체하면 스팸 외 다른 판정(유해 콘텐츠, 결제 
 
 ## TDD
 
+`pytest.ini`의 `testpaths`에 포함돼 있어 `cd minho && python -m pytest`만 실행해도 이 앱의
+테스트가 함께 돈다. ontology만 골라 돌리려면:
+
 ```bash
 cd minho
 python -m pytest apps/ontology/tests/ -v

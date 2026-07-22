@@ -16,3 +16,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 CLASSIFIER_CONFIDENCE_THRESHOLD = float(os.getenv("CLASSIFIER_CONFIDENCE_THRESHOLD", "0.5"))
 
 # Gemini 키·모델은 `matrix.app.keymaker` 의 Keymaker 가 단일 관리합니다.
+
+# JWT access token의 aud(audience). 서비스가 하나뿐인 현재는 기본값 "api" 그대로 쓰고,
+# 서비스가 늘어나면 배포별로 재정의한다(auth 발급부·백엔드 검증부가 반드시 같은 값을 써야 함).
+API_AUD = os.getenv("API_AUD", "api")
+
+# jti 기준 즉시 차단(블랙리스트) Redis 키 접두사. apps.auth(발급부)와
+# core.dependencies(검증부) 양쪽이 같은 키를 봐야 해서 여기 하나로 둔다 — core는
+# apps.auth를 import할 수 없으므로(auth-isolation 계약) 상수만 공유한다.
+AUTHGW_BLACKLIST_PREFIX = "authgw:blacklist:"

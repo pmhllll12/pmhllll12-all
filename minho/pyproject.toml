@@ -24,43 +24,30 @@ indent-style = "space"
 # minho, minho/apps, minho/core 포함 — main.py의 sys.path 구성과 동일해야 함)
 # ---------------------------------------------------------------------------
 [tool.importlinter]
+# star_craft(허브)는 architecture-star-topology.md가 설명하는 미래 설계로, 아직
+# apps/에 실제로 만들어지지 않았다. imitation_game/friday_13th/inception은 한때
+# 실존한 스포크였으나(architecture-star-topology.md 67행이 friday_13th의 기존
+# 위반을 언급) 지금은 apps/ 에 없다 — 언제 없어졌는지는 git 이력에 남아있지 않다.
+# 셋 다 root_packages에 있으면 import-linter가 패키지를 찾지 못해 lint-imports
+# 자체가 실행되지 않으므로(2026-07-22 확인), 실제 존재하는 패키지만 남긴다.
+# 허브가 생기면 1번 contract를, 스포크가 새로 생기면 해당 이름을 다시 추가한다.
 root_packages = [
-    "star_craft",
     "titanic",
     "soccer",
     "social_network",
     "matching",
-    "imitation_game",
-    "friday_13th",
     "admin",
-    "inception",
     "moneyball",
+    "community",
+    "sample",
     "ontology",
+    "auth",
     "core",
     "matrix",
     "adapters",
 ]
 
-# 1) 허브(star_craft)는 스포크를 알 수 있지만, 스포크는 허브를 모른다.
-#    "허브는 스포크를 알 수 있지만 스포크 간 직접 의존성은 금지"의 절반(허브→스포크 방향).
-[[tool.importlinter.contracts]]
-name = "허브(star_craft)는 스포크를 알지만, 스포크는 허브를 모른다"
-type = "forbidden"
-source_modules = [
-    "titanic",
-    "soccer",
-    "social_network",
-    "matching",
-    "imitation_game",
-    "friday_13th",
-    "admin",
-    "inception",
-    "moneyball",
-]
-forbidden_modules = ["star_craft"]
-
-# 2) 스포크 간 직접 의존성 철저히 금지 (양방향). 현재 friday_13th가 titanic을
-#    직접 import하고 있어 이 contract는 처음 실행 시 FAIL 한다 — 별도로 고쳐야 함.
+# 1) 스포크 간 직접 의존성 철저히 금지 (양방향).
 [[tool.importlinter.contracts]]
 name = "스포크는 서로 직접 import 할 수 없다"
 type = "independence"
@@ -69,37 +56,35 @@ modules = [
     "soccer",
     "social_network",
     "matching",
-    "imitation_game",
-    "friday_13th",
     "admin",
-    "inception",
     "moneyball",
+    "community",
+    "sample",
 ]
 
-# 3) 온톨로지(ontology)·공통 인프라(core/matrix/adapters)는 그래프 최하단.
+# 2) 온톨로지(ontology)·공통 인프라(core/matrix/adapters)는 그래프 최하단.
 #    허브·스포크 누구나 이들을 참조할 수 있지만, 이들은 허브·스포크를 절대 모른다.
 [[tool.importlinter.contracts]]
 name = "온톨로지·공통 인프라는 허브/스포크를 모른다 (그래프 최하단)"
 type = "forbidden"
 source_modules = ["ontology", "core", "matrix", "adapters"]
 forbidden_modules = [
-    "star_craft",
     "titanic",
     "soccer",
     "social_network",
     "matching",
-    "imitation_game",
-    "friday_13th",
     "admin",
-    "inception",
     "moneyball",
+    "community",
+    "sample",
 ]
 
-# 4) 모듈 내부 클린 아키텍처 계층: adapter → app(use case) → domain.
+# 3) 모듈 내부 클린 아키텍처 계층: adapter → app(use case) → domain.
 #    domain은 아무것도 모르고, app은 domain만 알고, adapter는 둘 다 안다.
 #    soccer/matching은 아직 domain 계층이 없어 제외.
 #    titanic은 app(ports/use_cases)이 adapter의 schemas를 직접 참조하는 기존
 #    위반이 ~25곳 있어 일단 제외 — DTO를 app/dtos/로 옮기는 별도 작업 후 추가할 것.
+#    community/sample/moneyball은 이번 작업 범위 밖이라 검증하지 않고 제외 상태 유지.
 [[tool.importlinter.contracts]]
 name = "각 허브/스포크 내부 클린 아키텍처 계층 (domain ← app ← adapter)"
 type = "layers"
@@ -109,10 +94,24 @@ layers = [
     "domain",
 ]
 containers = [
-    "star_craft",
-    "friday_13th",
-    "imitation_game",
-    "inception",
     "admin",
     "social_network",
 ]
+
+# 4) auth(인증 게이트웨이)는 발급 전용 — main.py/auth_main.py(root_packages 밖)만
+#    apps.auth를 import할 수 있고, 다른 앱은 core.dependencies만 써야 한다.
+[[tool.importlinter.contracts]]
+name = "apps.auth는 auth_main에서만 import된다"
+type = "forbidden"
+source_modules = [
+    "admin",
+    "community",
+    "matching",
+    "moneyball",
+    "ontology",
+    "sample",
+    "soccer",
+    "social_network",
+    "titanic",
+]
+forbidden_modules = ["auth"]

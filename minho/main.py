@@ -53,8 +53,15 @@ from admin.adapter.inbound.mcp.piper_dunn_coo_tools import mcp as dunn_mcp
 from admin.adapter.inbound.mcp.piper_gilfoyle_system_tools import mcp as gilfoyle_mcp
 from admin.adapter.inbound.mcp.piper_hendricks_ceo_tools import mcp as hendricks_mcp
 from admin.dependencies.providers import get_n8n_client
-from community.adapter.inbound.api import community_router
-from fastapi import Depends, FastAPI, HTTPException, Request
+from auth.rbac import Role
+from community.adapter.inbound.api.v1.community_host_router import community_host_router
+from community.adapter.inbound.api.v1.discord_router import discord_router
+from community.adapter.inbound.api.v1.email_router import email_router
+from community.adapter.inbound.api.v1.juso_router import juso_router
+from community.adapter.inbound.api.v1.receiver_router import receiver_router
+from community.adapter.inbound.api.v1.telegram_router import telegram_router
+from community.adapter.inbound.api.v1.watcher_router import watcher_router
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from ontology.adapter.inbound.api import crawler_router, vision_router
@@ -68,6 +75,7 @@ from titanic.adapter.inbound.api import titanic_router
 import core.matrix.google_oauth_client as google_oauth_client
 import core.matrix.kakao_oauth_client as kakao_oauth_client
 import core.matrix.naver_oauth_client as naver_oauth_client
+from core.dependencies import RoleChecker
 from core.matrix.oauth_state import (
     OAuthNotConfiguredError,
     resolve_return_origin,
@@ -239,7 +247,23 @@ register_secom_routes(app)
 
 app.include_router(titanic_router)
 app.include_router(silicon_valley_router)
-app.include_router(community_router)
+
+# community_router를 apps/community에서 그대로 가져오지 않고 여기서 재구성한 이유:
+# juso(/api/community/juso)에만 RoleChecker(Role.USER) 보호를 예시로 적용하기
+# 위해서다 — apps/community 코드는 한 줄도 수정하지 않는다는 절대 규칙 때문에,
+# main.py에서 하위 라우터를 개별적으로 다시 마운트해 juso에만 dependencies를 건다.
+# (apps/community/adapter/inbound/api/__init__.py의 community_router 구성과 동일한
+# 라우터 목록 — 새 라우터가 거기 추가되면 여기도 맞춰야 함)
+_community_router = APIRouter(prefix="/api/community")
+_community_router.include_router(email_router)
+_community_router.include_router(community_host_router)
+_community_router.include_router(juso_router, dependencies=[Depends(RoleChecker(Role.USER))])
+_community_router.include_router(discord_router)
+_community_router.include_router(telegram_router)
+_community_router.include_router(receiver_router)
+_community_router.include_router(watcher_router)
+app.include_router(_community_router)
+
 app.include_router(vision_router)
 app.include_router(crawler_router)
 

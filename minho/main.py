@@ -234,7 +234,12 @@ app = FastAPI(title="TJ Watson Main Page", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000","http://127.0.0.1:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://pmhllll12.cloud",
+        "https://www.pmhllll12.cloud",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -32,6 +32,8 @@ services:
     command: uvicorn auth_main:app --host 0.0.0.0 --port 9000
     expose:
       - "9000"
+    ports:
+      - "127.0.0.1:9000:9000"
     env_file:
       - ./minho/.env.auth
     depends_on:

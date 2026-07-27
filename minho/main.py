@@ -46,7 +46,7 @@ from typing import Any
 
 from adapters.db_health_adapter import DbHealthAdapter
 from adapters.weather_adapter import fetch_seoul_weather
-from admin.adapter.inbound.api import silicon_valley_router
+from admin.adapter.inbound.api import admin_pdf_router, silicon_valley_router
 from admin.adapter.inbound.mcp.piper_bighetti_hr_tools import mcp as bighetti_mcp
 from admin.adapter.inbound.mcp.piper_dinesh_dash_tools import mcp as dinesh_mcp
 from admin.adapter.inbound.mcp.piper_dunn_coo_tools import mcp as dunn_mcp
@@ -249,6 +249,7 @@ register_secom_routes(app)
 app.include_router(titanic_router)
 app.include_router(moneyball_router)
 app.include_router(silicon_valley_router)
+app.include_router(admin_pdf_router)
 
 # community_router를 apps/community에서 그대로 가져오지 않고 여기서 재구성한 이유:
 # juso(/api/community/juso)에만 RoleChecker(Role.USER) 보호를 예시로 적용하기

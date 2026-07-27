@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from admin.adapter.inbound.api.v1.pdf_loader_router import pdf_loader_router as _pdf_loader_router
 from admin.adapter.inbound.api.v1.piper_bighetti_hr_router import (
     bighetti_hr_router as piper_bighetti_hr_router,
 )
@@ -18,15 +18,21 @@ from admin.adapter.inbound.api.v1.piper_gilfoyle_system_router import (
 from admin.adapter.inbound.api.v1.piper_hendricks_ceo_router import (
     hendricks_ceo_router as piper_hendricks_ceo_router,
 )
+from fastapi import APIRouter
 
 silicon_valley_router = APIRouter(prefix="/api/v1", tags=["silicon_valley"])
+admin_pdf_router = APIRouter(prefix="/api/admin")
 
 _CHARACTERS = [
     {"route": "hendricks", "english_name": "Richard Hendricks", "korean_name": "리처드 헨드릭스"},
     {"route": "dunn", "english_name": "Jared Dunn", "korean_name": "자레드 던"},
     {"route": "gilfoyle", "english_name": "Bertram Gilfoyle", "korean_name": "버트럼 길포일"},
     {"route": "dinesh", "english_name": "Dinesh Chugtai", "korean_name": "디네시 추그타이"},
-    {"route": "bighetti", "english_name": "Nelson 'Big Head' Bighetti", "korean_name": "넬슨 '빅헤드' 비게티"},
+    {
+        "route": "bighetti",
+        "english_name": "Nelson 'Big Head' Bighetti",
+        "korean_name": "넬슨 '빅헤드' 비게티",
+    },
 ]
 
 
@@ -45,4 +51,6 @@ silicon_valley_router.include_router(piper_gilfoyle_system_router)
 silicon_valley_router.include_router(piper_dinesh_dash_router)
 silicon_valley_router.include_router(piper_bighetti_hr_router)
 
-__all__ = ["silicon_valley_router"]
+admin_pdf_router.include_router(_pdf_loader_router)
+
+__all__ = ["silicon_valley_router", "admin_pdf_router"]

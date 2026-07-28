@@ -9,7 +9,7 @@
 - Neo4j 컨테이너: `docker-compose.yaml`의 `neo4j` 서비스(`neo4j:5-community`, Bolt `7687`, 브라우저 `7474`).
 - 인증: `NEO4J_AUTH: neo4j/${NEO4J_PASSWORD}` — 사용자명은 `neo4j` 고정, 비밀번호는 루트 `.env`의 `NEO4J_PASSWORD`.
 - 드라이버/도구: `minho/requirements.txt`의 `neo4j-graphrag==1.18.0`(내부에 `neo4j` 공식 드라이버 포함).
-- `backend` 서비스는 `depends_on: [neo4j]`까지만 되어 있고 `NEO4J_URI`/`NEO4J_USER`/`NEO4J_PASSWORD` 환경변수는 아직 주입되지 않는다 — 연결 코드를 작성하는 시점에 `docker-compose.yaml`의 `backend.environment`와 `minho/.env.example`에 추가한다(§4).
+- `backend` 서비스는 `depends_on`에 `neo4j`(및 `pgvector`, `redis`)가 포함되어 있지만, `backend.environment`에는 아직 `NEO4J_URI`/`NEO4J_USER`/`NEO4J_PASSWORD`가 주입되지 않는다 — 연결 코드를 작성하는 시점에 `docker-compose.yaml`의 `backend.environment`와 `minho/.env.example`에 추가한다(§4).
 
 ---
 

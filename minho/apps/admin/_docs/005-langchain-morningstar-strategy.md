@@ -43,9 +43,9 @@ dependencies/morningstar_insight_provider.py
 
 ### 환경 변수
 
-로컬 Ollama 서버(`core/lol/t1_mid_faker_orchestrator.py`와 동일한 관례)를 사용한다.
+로컬 Ollama 서버를 사용한다. 환경변수명은 `docker-compose.yaml`(`OLLAMA_HOST`)·`minho/test.py`(`OLLAMA_MODEL`)의 기존 관례를 따른다 — 상세는 [003-langchain_harness.md](003-langchain_harness.md) §4 참고.
 
 ```
-OLLAMA_BASE_URL=http://localhost:11434   # 선택, 기본값 위와 동일
-OLLAMA_MODEL=exaone3.5:2.4b              # 선택, 기본값 위와 동일
+OLLAMA_HOST=http://localhost:11434   # Docker: http://host.docker.internal:11434
+OLLAMA_MODEL=qwen2.5:3b               # 선택, 미설정 시 어댑터 기본값 사용
 ```

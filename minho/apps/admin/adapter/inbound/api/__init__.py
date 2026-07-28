@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from admin.adapter.inbound.api.v1.langchain_chat_router import (
+    langchain_chat_router as _langchain_chat_router,
+)
 from admin.adapter.inbound.api.v1.pdf_loader_router import pdf_loader_router as _pdf_loader_router
 from admin.adapter.inbound.api.v1.piper_bighetti_hr_router import (
     bighetti_hr_router as piper_bighetti_hr_router,
@@ -52,5 +55,6 @@ silicon_valley_router.include_router(piper_dinesh_dash_router)
 silicon_valley_router.include_router(piper_bighetti_hr_router)
 
 admin_pdf_router.include_router(_pdf_loader_router)
+admin_pdf_router.include_router(_langchain_chat_router)
 
 __all__ = ["silicon_valley_router", "admin_pdf_router"]

@@ -7,6 +7,7 @@ import WorldCupGroupsSection from "@/components/WorldCupGroupsSection";
 import WorldCupTeamsSection from "@/components/WorldCupTeamsSection";
 import WorldCupStatsSection from "@/components/WorldCupStatsSection";
 import GeminiChat from "@/components/GeminiChat";
+import LangchainChat from "@/components/LangchainChat";
 import "./home.css";
 
 export default function Home() {
@@ -27,11 +28,12 @@ export default function Home() {
             }
           />
         </div>
-        <div className="home-grid-chat relative z-[2] flex items-start justify-center w-full min-w-0 box-border 1200:pt-12">
+        <div className="home-grid-chat relative z-[2] flex flex-col items-start justify-center gap-4 w-full min-w-0 box-border 1200:pt-12">
           <GeminiChat
             preset={geminiPreset}
             onPresetConsumed={() => setGeminiPreset(null)}
           />
+          <LangchainChat />
         </div>
         <div className="home-grid-prediction min-w-0 w-full max-w-full">
           <HeroPredictionPanel

@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 from fastapi import Depends
-from ontology.adapter.outbound.langchain_chatbot_engine import LangchainChatbotEngine
+from ontology.adapter.outbound.gemini_chatbot_engine import GeminiChatbotEngine
 from ontology.adapter.outbound.repositories.intent_route_repository import (
     InMemoryIntentRouteRepository,
 )
@@ -30,7 +30,7 @@ def get_semantic_intent_classifier(
 
 @lru_cache
 def get_chatbot_engine() -> ChatbotEnginePort:
-    return LangchainChatbotEngine()
+    return GeminiChatbotEngine()
 
 
 def get_semantic_chat_use_case(

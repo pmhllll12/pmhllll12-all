@@ -1,41 +1,30 @@
 from __future__ import annotations
 
+import asyncio
 import logging
-import os
 
 import numpy as np
-from langchain_ollama import OllamaEmbeddings
-from ontology.adapter.outbound.ollama_errors import OllamaUnavailableError
 from ontology.app.ports.output.intent_route_repository_port import IntentRouteRepositoryPort
 from ontology.app.ports.output.semantic_intent_classifier_port import SemanticIntentClassifierPort
 from ontology.domain.chat_intent import ChatIntent
 from ontology.domain.intent_route import IntentRoute
 
-logger = logging.getLogger(__name__)
+from core.matrix.vault_keymaker_secret_manager import keymaker
 
-_DEFAULT_OLLAMA_HOST = "http://localhost:11434"
-_DEFAULT_EMBED_MODEL = "nomic-embed-text"
+logger = logging.getLogger(__name__)
 
 
 class SemanticIntentClassifier(SemanticIntentClassifierPort):
-    """route 예시 발화를 임베딩해, 메시지와 코사인 유사도가 가장 가까운 의도로 분류한다."""
+    """route 예시 발화를 Gemini 임베딩으로 변환해, 메시지와 코사인 유사도가 가장 가까운 의도로
+    분류한다."""
 
     def __init__(self, route_repository: IntentRouteRepositoryPort) -> None:
         self._route_repository = route_repository
-        self._host = os.getenv("OLLAMA_HOST", _DEFAULT_OLLAMA_HOST)
-        self._model = os.getenv("OLLAMA_EMBED_MODEL") or _DEFAULT_EMBED_MODEL
-        self._embeddings = OllamaEmbeddings(base_url=self._host, model=self._model)
         self._route_vectors: list[tuple[IntentRoute, np.ndarray]] | None = None
 
     async def classify(self, message: str) -> ChatIntent:
-        try:
-            route_vectors = await self._get_route_vectors()
-            message_vector = np.array(await self._embeddings.aembed_query(message))
-        except Exception as exc:  # noqa: BLE001 — 외부 서비스 경계, 원인 불문 상위에서 503 등으로 변환
-            logger.warning("[SemanticIntentClassifier] 임베딩 실패: %s", exc)
-            raise OllamaUnavailableError(
-                f"Ollama 임베딩 모델({self._model})에 연결할 수 없습니다."
-            ) from exc
+        route_vectors = await self._get_route_vectors()
+        message_vector = np.array(await asyncio.to_thread(keymaker.embed_content, message))
 
         best_route, best_score = max(
             (
@@ -58,8 +47,12 @@ class SemanticIntentClassifier(SemanticIntentClassifierPort):
         routes = await self._route_repository.list_routes()
         route_vectors: list[tuple[IntentRoute, np.ndarray]] = []
         for route in routes:
-            vectors = np.array(await self._embeddings.aembed_documents(route.example_utterances))
-            route_vectors.append((route, vectors))
+            embeddings = [
+                await asyncio.to_thread(keymaker.embed_content, utterance)
+                for utterance in route.example_utterances
+            ]
+            route_vectors.append((route, np.array(embeddings)))
+        logger.info("[SemanticIntentClassifier] route 임베딩 캐시 생성: %d개", len(route_vectors))
         self._route_vectors = route_vectors
         return route_vectors
 

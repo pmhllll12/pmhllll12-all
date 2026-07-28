@@ -48,16 +48,19 @@
 
 ## 4. 연결 설정
 
-로컬 Ollama 서버를 사용한다. 이 저장소의 실제 관례는 `OLLAMA_HOST`(서버 주소)·`OLLAMA_MODEL`(모델명)이다 — `docker-compose.yaml`의 `backend.environment`가 `OLLAMA_HOST`를 주입하고, `minho/test.py`가 `os.getenv("OLLAMA_MODEL")`을 기본값과 함께 읽는 패턴을 그대로 따른다. `core/lol/t1_mid_faker_orchestrator.py`는 모델명을 코드에 하드코딩하고 환경변수를 전혀 읽지 않는 예외 사례이므로 참고하지 않는다 — 새 LangChain 어댑터는 두 값 모두 반드시 환경변수로 읽는다.
+로컬 Ollama 서버(`OLLAMA_HOST`/`OLLAMA_MODEL`, `langchain-ollama`의 `ChatOllama`)가 기본 관례이지만,
+`admin/langchain-chat`·`ontology/semantic-chat` 두 구현은 배포 서버(AWS EC2)의 디스크·메모리
+여유가 부족해 Ollama 대신 **이미 설정된 `GEMINI_API_KEY`**(`core/matrix/vault_keymaker_secret_manager.keymaker`)를
+재사용한다 — `keymaker.generate_content(prompt)`(생성), `keymaker.embed_content(text)`(임베딩,
+`gemini-embedding-001`)를 어댑터에서 직접 호출한다. 새 환경변수는 필요 없다.
 
-```
-OLLAMA_HOST=http://localhost:11434   # Docker: http://host.docker.internal:11434 (docker-compose.yaml 참고)
-OLLAMA_MODEL=qwen2.5:3b               # 선택, 미설정 시 어댑터 기본값 사용
-```
-
-- `minho/.env.example`에 위 두 키를 주석과 함께 추가한다.
-- `langchain-ollama`의 `ChatOllama(base_url=..., model=...)`에 위 두 환경변수 값을 그대로 전달한다 — `base_url` 인자명과 환경변수명(`OLLAMA_HOST`)이 다르다고 임의로 `OLLAMA_BASE_URL` 같은 새 이름을 만들지 않는다.
-- `OLLAMA_HOST` 미설정 시에도 나머지 API가 죽지 않도록, 어댑터 생성자에서 접속 실패를 라우터 레벨의 503 등으로 변환한다(`database.py`가 `DATABASE_URL` 미설정을 다루는 패턴과 동일).
+- 포트(`LangchainChatClientPort`, `ChatbotEnginePort`, `SemanticIntentClassifierPort`)는 그대로 두고
+  구현체만 교체했다 — 이게 애초에 포트를 둔 이유다(LLM 벤더를 바꿔도 인터랙터·도메인은 안 바뀐다).
+- 자원이 넉넉한 환경(로컬 개발 등)에서 새 LangChain 유스케이스를 추가할 때는 여전히 Ollama를
+  기본으로 한다 — 이 예외는 "제약이 있으면 그에 맞춰 판단한다"는 사례이지, Ollama 관례를
+  대체하는 것은 아니다.
+- 에러 매핑은 `MissingApiKeyError`(503)·`format_gemini_error`(429/404/502 등)를 그대로 재사용한다
+  (`main.py`의 `/chat`, `pdf_loader_router.py`와 동일 패턴).
 
 ---
 
@@ -76,6 +79,6 @@ OLLAMA_MODEL=qwen2.5:3b               # 선택, 미설정 시 어댑터 기본�
 - [ ] LLM 모델명·서버 주소가 환경변수로 주입되고 코드에 하드코딩되지 않는다.
 - [ ] 텍스트 분할의 `chunk_size`/`chunk_overlap`이 상수로 명시돼 있다.
 - [ ] 새 벡터 저장소 인프라를 추가하기 전 기존 자원(pgvector 등) 재사용 여부를 검토했다.
-- [ ] `minho/.env.example`에 `OLLAMA_BASE_URL`/`OLLAMA_MODEL` 추가.
-- [ ] `OLLAMA_BASE_URL` 미설정 시 나머지 API가 죽지 않는다.
+- [ ] Ollama를 쓴다면 `minho/.env.example`에 `OLLAMA_HOST`/`OLLAMA_MODEL` 추가, Gemini(`keymaker`)를 쓴다면 기존 `GEMINI_API_KEY` 재사용(§4).
+- [ ] LLM 연결 실패(Ollama 미기동, `GEMINI_API_KEY` 없음 등) 시에도 나머지 API가 죽지 않는다.
 - [ ] 구현 완료 후 [005-langchain-morningstar-strategy.md](005-langchain-morningstar-strategy.md)의 레이어 매핑 표를 실제 파일명으로 갱신했다.

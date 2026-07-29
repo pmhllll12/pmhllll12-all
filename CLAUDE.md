@@ -34,6 +34,61 @@
 - UI: `http://localhost:3000` (`docker compose` 또는 `www` 에서 `npm run dev`)
 - 백엔드 로컬: [`minho/CLAUDE.md`](minho/CLAUDE.md)
 
+---
+
+## 프로젝트 개요
+
+모노레포. 세 영역으로 나뉜다.
+
+- **백엔드 `minho`** — Python / FastAPI (uvicorn·alembic). API 문서 `:8000/docs`.
+- **프런트엔드 `www`** — Next.js / TypeScript.
+- **`pmh_flutter`** — Flutter 앱.
+
+데이터: `docker-compose.yaml` 기준 PostgreSQL(pgvector) + Redis.
+
+---
+
+## 명령어
+
+영역마다 스택이 달라 실행 명령이 다르다.
+
+    # 프런트엔드(www) — 루트 npm run dev 는 www dev 를 위임 실행한다
+    npm run dev                 # 개발 서버(:3000)
+    npm run build --prefix www  # 빌드
+    npm run lint --prefix www   # eslint
+    npm run format --prefix www # prettier --check
+
+    # 백엔드(minho) — 로컬 실행 (상세는 minho/CLAUDE.md)
+    python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+
+---
+
+## 코딩 컨벤션
+
+- **프런트엔드(`www`)**: 세미콜론 사용. ESLint에서 `no-console`·`no-explicit-any`·`no-unused-vars`가 `error`(위반 시 빌드/pre-commit이 막힌다). import는 `@/` 별칭. TypeScript 세부 규칙은 [`.claude/rules/typescript.md`](.claude/rules/typescript.md).
+- **백엔드(`minho`)**: Python. lint·format은 ruff(`minho/pyproject.toml`의 `[tool.ruff]`).
+
+---
+
+## 테스트
+
+- **백엔드(`minho`)**: pytest. `pytest.ini`의 `testpaths = apps/titanic/tests`.
+- **프런트엔드(`www`)**: 별도 테스트 프레임워크는 아직 설정돼 있지 않다(추가 시 이 절 갱신).
+
+---
+
+## 브랜치 전략
+
+- `main`: 프로덕션 겸 PR 대상 브랜치.
+- 작업 브랜치: `neo`, `sigma` 등. (별도 `develop` 통합 브랜치는 없다.)
+
+---
+
+## 환경 변수
+
+- 루트 `.env` 사용(`.env.local` 아님). 키: `POSTGRES_PASSWORD`, `NEO4J_PASSWORD`, `CLOUDFLARE_TUNNEL_TOKEN`.
+- 백엔드 `DATABASE_URL`은 `docker-compose.yaml`에서 위 값으로 조립된다.
+
 # com.ragwatson
 
 이 저장소는 **코드와 함께 두는 에이전트 하네스**(규칙·검증·스코프)를 전제로 한다. [Andrej Karpathy가 정리한 LLM 코딩 함정](https://x.com/karpathy/status/2015883857489522876)(침묵 가정, 과설계, diff 범람, 모호한 완료)을 줄이기 위해, 사람과 Cursor 에이전트가 같은 기준을 보도록 문서를 나눠 두었다.
@@ -76,3 +131,9 @@
 ## 이 README의 역할
 
 프로젝트 기능 설명이 길어지면 README가 또 하나의 “거대한 하네스”가 되어 모델과 사람 모두 핵심을 놓친다. **제품·도메인 상세**는 하위 패키지 README나 위키로 두고, 루트 README는 **입구 + 하네스 안내**에 집중한다.
+
+## 커밋 메시지 규칙
+- Conventional Commits 형식 사용 (feat:, fix:, docs:, refactor:)
+- 제목은 50자 이내
+- 한국어로 작성
+- 예시: feat: 사용자 로그인 기능 추가

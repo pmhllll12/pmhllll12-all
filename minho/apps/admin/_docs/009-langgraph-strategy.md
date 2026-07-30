@@ -285,7 +285,9 @@ dependencies/document_graph_provider.py
 | `langchain-experimental` | `LLMGraphTransformer` | `langchain` 1.3.x 호환. 안 맞으면 §6 3번안(직접 프롬프트)으로 대체 |
 | `langgraph-checkpoint-postgres` | §5 조건 충족 시에만 | `langgraph` 1.2.6의 `BaseCheckpointSaver` 호환 |
 
-`neo4j-graphrag==1.18.0`이 이미 있으므로 `neo4j` 공식 드라이버는 별도 추가가 필요 없다.
+`neo4j` 공식 드라이버는 `neo4j-graphrag==1.18.0`이 전이적으로 끌어오지만, **직접 import하는
+패키지이므로 `neo4j>=5.0,<6.0`으로 명시적으로 고정한다** — 근거와 절차는
+[008-neo4j-strategy.md](008-neo4j-strategy.md) §2.4.
 
 ### 환경 변수
 
@@ -311,7 +313,7 @@ NEO4J_PASSWORD=<루트 .env의 NEO4J_PASSWORD와 동일>
 
 **선행 조건**
 - [ ] §0의 표에서 "Neo4j 필요" 쪽 조건이 실제 요구로 확인됐다(아니면 착수하지 않는다).
-- [ ] `docker-compose.yaml`의 `backend.environment`에 `NEO4J_URI` 추가, `minho/.env.example`에 세 키 추가.
+- [ ] [008-neo4j-strategy.md](008-neo4j-strategy.md) §5의 연결 체크리스트를 먼저 통과했다 — 컨테이너 healthcheck, `NEO4J_URI` 주입, 드라이버 관리자. **연결 없이는 이 문서의 어떤 단계도 시작할 수 없다.**
 - [ ] 신규 의존성 3종의 `langchain` 1.3.x / `langgraph` 1.2.6 호환을 실제로 확인한 뒤 `requirements.txt`에 추가했다.
 
 **1단계 — 적재**

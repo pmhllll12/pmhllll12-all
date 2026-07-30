@@ -86,6 +86,7 @@ docker compose up --build -d
 | 엔티티·PK | [`_docs/entity-rules.md`](_docs/entity-rules.md) |
 | Alembic | [`alembic/README.md`](alembic/README.md) |
 | 스타 토폴로지(허브/스포크/온톨로지) | [`_docs/architecture-star-topology.md`](_docs/architecture-star-topology.md) |
+| pgvector 덤프·DB 이관 | [`_docs/pgvector-dump-strategy.md`](_docs/pgvector-dump-strategy.md) |
 
 ---
 

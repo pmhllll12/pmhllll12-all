@@ -19,6 +19,47 @@
 - 모든 스크립트는 backend 컨테이너 안, 작업 디렉터리 `/app`에서 실행한다.
 - 커밋 메시지는 Conventional Commits + 한국어, 제목 50자 이내다.
 
+### 실행 환경 (2026-07-30 실측으로 확정)
+
+`minho/Dockerfile:23`이 `COPY . .`로 소스를 이미지에 굽고 backend 컨테이너에는
+볼륨 마운트가 없다. 따라서 호스트에서 만든 파일은 **재빌드해야** 컨테이너에
+보인다. `pytest`는 호스트·컨테이너 어디에도 없고 `requirements*.txt`에 선언조차
+없었다 (이 계획에서 `requirements-dev.txt`에 `pytest==8.3.4`를 추가해 교정했다).
+
+두 가지 실행 경로를 쓴다.
+
+**① 단위 테스트 — dev 이미지 + 호스트 소스 바인드 마운트 (재빌드 불필요)**
+
+```bash
+docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app \
+  pmhllll12-all-backend-dev python -m pytest <경로> -v
+```
+
+dev 이미지는 런타임 이미지 위에 검증 도구만 얹은 것이다. 최초 1회만 만든다:
+
+```bash
+docker build -t pmhllll12-all-backend-dev - <<'EOF'
+FROM pmhllll12-all-backend
+RUN pip install --no-cache-dir pytest==8.3.4 ruff==0.12.0 import-linter==2.12
+EOF
+```
+
+**② 마이그레이션·스크립트 — 재빌드 후 실제 backend 컨테이너**
+
+```bash
+cd /home/ec2-user/pmhllll12-all && docker compose build backend && docker compose up -d backend
+```
+
+`requirements.txt`가 안 바뀌면 캐시가 살아 **약 2.4초**로 끝난다.
+
+### 테스트 베이스라인 (변경 전)
+
+`2 failed, 145 passed, 4 skipped`. 실패 2건은
+`apps/ontology/tests/app/use_cases/test_image_classifier_interactor.py`의
+`test_classify_rejects_empty_content`·`test_classify_rejects_corrupted_image`이고,
+원인은 `apps/ontology/models/convnext_nano.onnx` 파일 부재다. **이번 작업과
+무관하므로 Task 5에서 이 2건은 실패로 치지 않는다.**
+
 ---
 
 ### Task 1: ORM 모델과 테이블 생성 마이그레이션
@@ -89,7 +130,7 @@ def test_embedding_columns_are_768_dim_and_nullable():
 
 - [ ] **Step 3: 테스트가 실패하는지 확인**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest apps/ontology/tests/adapter/outbound/orm/test_users_jobs_orm.py -v`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest apps/ontology/tests/adapter/outbound/orm/test_users_jobs_orm.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'ontology.adapter.outbound.orm.user_orm'`
 
 - [ ] **Step 4: `UserOrm` 작성**
@@ -160,7 +201,7 @@ class JobOrm(Base):
 
 - [ ] **Step 6: 테스트가 통과하는지 확인**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest apps/ontology/tests/adapter/outbound/orm/test_users_jobs_orm.py -v`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest apps/ontology/tests/adapter/outbound/orm/test_users_jobs_orm.py -v`
 Expected: PASS (4 passed)
 
 - [ ] **Step 7: `create_all_tables()`에 모델 등록**
@@ -243,14 +284,18 @@ def downgrade() -> None:
         op.drop_table("ontology_users")
 ```
 
-- [ ] **Step 9: 마이그레이션 적용**
+- [ ] **Step 9: 이미지 재빌드 후 마이그레이션 적용**
+
+새 마이그레이션 파일은 재빌드해야 컨테이너에 들어간다.
 
 ```bash
+cd /home/ec2-user/pmhllll12-all && docker compose build backend && docker compose up -d backend
+docker exec pmhllll12-all-backend-1 ls alembic/versions/ | grep 20260730_0002
 docker exec pmhllll12-all-backend-1 alembic upgrade head
 docker exec pmhllll12-all-backend-1 alembic current
 ```
 
-Expected: `20260730_0002 (head)`
+Expected: `grep`이 파일을 찾고, `alembic current`가 `20260730_0002 (head)`
 
 - [ ] **Step 10: 실제 스키마 검증**
 
@@ -348,7 +393,7 @@ def test_seed_resets_both_sequences():
 
 - [ ] **Step 3: 테스트가 실패하는지 확인**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest apps/ontology/tests/adapter/outbound/orm/test_users_jobs_seed_sql.py -v`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest apps/ontology/tests/adapter/outbound/orm/test_users_jobs_seed_sql.py -v`
 Expected: FAIL — `assert False` (파일 없음)
 
 - [ ] **Step 4: 시드 SQL 작성**
@@ -382,7 +427,7 @@ SELECT setval('ontology_jobs_id_seq', 5, true);
 
 - [ ] **Step 5: 테스트가 통과하는지 확인**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest apps/ontology/tests/adapter/outbound/orm/test_users_jobs_seed_sql.py -v`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest apps/ontology/tests/adapter/outbound/orm/test_users_jobs_seed_sql.py -v`
 Expected: PASS (4 passed)
 
 - [ ] **Step 6: 시드 마이그레이션 작성**
@@ -444,9 +489,12 @@ def downgrade() -> None:
 
 `_SEED_FILE` 경로 계산은 `20260713_0002_seed_moneyball_soccer_data.py:24`와 같은 방식이다 (`versions/` → `alembic/` → `minho/`).
 
-- [ ] **Step 7: 마이그레이션 적용**
+- [ ] **Step 7: 이미지 재빌드 후 마이그레이션 적용**
+
+시드 SQL 파일과 마이그레이션 모두 재빌드해야 컨테이너에 들어간다.
 
 ```bash
+cd /home/ec2-user/pmhllll12-all && docker compose build backend && docker compose up -d backend
 docker exec pmhllll12-all-backend-1 alembic upgrade head
 docker exec pmhllll12-all-backend-1 alembic current
 ```
@@ -615,7 +663,7 @@ def test_backfill_rejects_wrong_dimension_vector():
 
 - [ ] **Step 3: 테스트가 실패하는지 확인**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest apps/ontology/tests/app/use_cases/test_users_jobs_embedding_backfill.py -v`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest apps/ontology/tests/app/use_cases/test_users_jobs_embedding_backfill.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'ontology.app.use_cases.users_jobs_embedding_backfill'`
 
 - [ ] **Step 4: 백필 유스케이스 작성**
@@ -696,7 +744,7 @@ async def backfill_rows(
 
 - [ ] **Step 5: 테스트가 통과하는지 확인**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest apps/ontology/tests/app/use_cases/test_users_jobs_embedding_backfill.py -v`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest apps/ontology/tests/app/use_cases/test_users_jobs_embedding_backfill.py -v`
 Expected: PASS (6 passed)
 
 - [ ] **Step 6: Gemini 어댑터 작성**
@@ -840,9 +888,10 @@ if __name__ == "__main__":
 
 벡터를 `str(vector)`로 넘기는 이유: pgvector는 `'[0.1,0.2,...]'` 형태의 문자열 리터럴을 vector로 캐스팅한다. 파이썬 리스트의 `str()`이 정확히 그 형태다. `CAST(:v AS vector)`를 반드시 붙인다 — 없으면 드라이버가 파라미터를 text 타입으로 보내 `column "embedding" is of type vector but expression is of type text` 오류가 난다.
 
-- [ ] **Step 8: 백필 실행**
+- [ ] **Step 8: 이미지 재빌드 후 백필 실행**
 
 ```bash
+cd /home/ec2-user/pmhllll12-all && docker compose build backend && docker compose up -d backend
 docker exec pmhllll12-all-backend-1 \
   python apps/ontology/scripts/backfill_users_jobs_embedding.py
 ```
@@ -990,7 +1039,7 @@ def test_write_graph_passes_row_values_as_parameters():
 
 - [ ] **Step 4: 테스트가 실패하는지 확인**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest apps/ontology/tests/adapter/outbound/test_neo4j_users_jobs_writer.py -v`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest apps/ontology/tests/adapter/outbound/test_neo4j_users_jobs_writer.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'ontology.adapter.outbound.neo4j_users_jobs_writer'`
 
 - [ ] **Step 5: Cypher 작성기 구현**
@@ -1063,7 +1112,7 @@ def write_graph(
 
 - [ ] **Step 6: 테스트가 통과하는지 확인**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest apps/ontology/tests/adapter/outbound/test_neo4j_users_jobs_writer.py -v`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest apps/ontology/tests/adapter/outbound/test_neo4j_users_jobs_writer.py -v`
 Expected: PASS (4 passed)
 
 - [ ] **Step 7: 동기화 스크립트 작성**
@@ -1161,9 +1210,10 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
-- [ ] **Step 8: 동기화 실행**
+- [ ] **Step 8: 이미지 재빌드 후 동기화 실행**
 
 ```bash
+cd /home/ec2-user/pmhllll12-all && docker compose build backend && docker compose up -d backend
 docker exec pmhllll12-all-backend-1 \
   python apps/ontology/scripts/sync_users_jobs_to_neo4j.py
 ```
@@ -1222,20 +1272,21 @@ git commit -m "feat: ontology users/jobs Neo4j 그래프 동기화 추가"
 
 - [ ] **Step 1: 전체 테스트 실행**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && python -m pytest -q`
-Expected: 기존 테스트가 모두 통과하고, 이번에 추가한 18개(ORM 4 + 시드 4 + 백필 6 + Neo4j 작성기 4)가 함께 통과한다. 실패가 있으면 이 계획 이전에도 실패했는지 `git stash`로 확인한다.
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev python -m pytest -q`
+Expected: `2 failed, 163 passed, 4 skipped`. 실패 2건은 위 베이스라인과 동일한 `test_image_classifier_interactor.py`의 onnx 모델 부재 건이어야 한다. 통과 수가 `145 + 18 = 163`이면 이번에 추가한 18개(ORM 4 + 시드 4 + 백필 6 + Neo4j 작성기 4)가 모두 통과한 것이다. 다른 실패가 새로 생기면 해당 Task로 돌아간다.
 
 - [ ] **Step 2: import 경계 검증**
 
-Run: `cd /home/ec2-user/pmhllll12-all/minho && lint-imports`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev lint-imports`
 Expected: 모든 contract가 KEPT. 특히 contract 2(`온톨로지·공통 인프라는 허브/스포크를 모른다`)가 깨지지 않아야 한다 — `ontology`가 `community`를 import하면 여기서 잡힌다.
 
 - [ ] **Step 3: 린트·포맷 검증**
 
 ```bash
-cd /home/ec2-user/pmhllll12-all/minho
-ruff check apps/ontology alembic/versions/20260730_0002_create_ontology_users_jobs.py alembic/versions/20260730_0003_seed_ontology_users_jobs.py
-ruff format --check apps/ontology
+docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev \
+  ruff check apps/ontology alembic/versions/20260730_0002_create_ontology_users_jobs.py alembic/versions/20260730_0003_seed_ontology_users_jobs.py
+docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev \
+  ruff format --check apps/ontology
 ```
 
 Expected: 위반 없음. 스크립트의 `# noqa: E402`가 있어 sys.path 조작 후 import는 통과한다.

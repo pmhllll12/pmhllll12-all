@@ -1,4 +1,5 @@
 # 런타임 이미지에는 불필요 — 로컬/CI 검증용. requirements.txt 와 분리.
+pytest==8.3.4
 ruff==0.12.0
 import-linter==2.12
 pre-commit==4.6.0

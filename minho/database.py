@@ -170,7 +170,7 @@ async def create_all_tables() -> None:
         stadium_orm,  # noqa: F401
         team_orm,  # noqa: F401
     )
-    from ontology.adapter.outbound.orm import vision_orm  # noqa: F401
+    from ontology.adapter.outbound.orm import job_orm, user_orm, vision_orm  # noqa: F401
     from secom.app.models import user_model  # noqa: F401
     from titanic.adapter.outbound.orm import (
         booking_orm,  # noqa: F401

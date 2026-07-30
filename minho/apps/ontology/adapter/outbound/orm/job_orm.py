@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from database import Base
+from ontology.adapter.outbound.orm.user_orm import UserOrm
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ontology.adapter.outbound.orm.user_orm import UserOrm
+from database import Base
 
 EMBEDDING_DIM = 768
 

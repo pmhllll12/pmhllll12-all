@@ -25,7 +25,6 @@ for _path in (str(_MINHO_ROOT), str(_APPS_ROOT)):
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("backfill_users_jobs_embedding")
 
-from database import AsyncSessionLocal  # noqa: E402
 from ontology.adapter.outbound.gemini_embedding_client import (  # noqa: E402
     GeminiEmbeddingClient,
 )
@@ -35,6 +34,8 @@ from ontology.app.use_cases.users_jobs_embedding_backfill import (  # noqa: E402
     build_user_text,
 )
 from sqlalchemy import text  # noqa: E402
+
+from database import AsyncSessionLocal  # noqa: E402
 
 
 async def main() -> int:

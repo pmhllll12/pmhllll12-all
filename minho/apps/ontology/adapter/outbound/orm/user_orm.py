@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from database import Base
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from database import Base
 
 EMBEDDING_DIM = 768
 
@@ -19,6 +20,6 @@ class UserOrm(Base):
     age: Mapped[int | None] = mapped_column(Integer, nullable=True)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM), nullable=True)
 
-    jobs: Mapped[list["JobOrm"]] = relationship(  # noqa: F821
+    jobs: Mapped[list[JobOrm]] = relationship(  # noqa: F821
         back_populates="user", cascade="all, delete-orphan"
     )

@@ -26,10 +26,11 @@ for _path in (str(_MINHO_ROOT), str(_APPS_ROOT)):
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("sync_users_jobs_to_neo4j")
 
-from database import AsyncSessionLocal  # noqa: E402
 from neo4j import GraphDatabase  # noqa: E402
 from ontology.adapter.outbound.neo4j_users_jobs_writer import write_graph  # noqa: E402
 from sqlalchemy import text  # noqa: E402
+
+from database import AsyncSessionLocal  # noqa: E402
 
 
 async def _load_rows() -> tuple[list[dict], list[dict]]:

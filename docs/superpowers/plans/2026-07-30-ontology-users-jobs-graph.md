@@ -1277,7 +1277,12 @@ Expected: `2 failed, 163 passed, 4 skipped`. 실패 2건은 위 베이스라인�
 
 - [ ] **Step 2: import 경계 검증**
 
-Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev lint-imports`
+Run: `docker run --rm -v /home/ec2-user/pmhllll12-all/minho:/app -w /app pmhllll12-all-backend-dev bash scripts/check_architecture.sh`
+
+`lint-imports` 를 직접 부르면 안 된다. `scripts/check_architecture.sh` 가
+`PYTHONPATH="$PWD:$PWD/apps:$PWD/core"` 를 설정하는데, 여기 `core` 가 있어야
+`root_packages` 의 `matrix`(실제 위치 `core/matrix`)가 최상위로 import된다.
+직접 부르면 `No module named 'matrix'` 로 실행 자체가 실패한다.
 Expected: 모든 contract가 KEPT. 특히 contract 2(`온톨로지·공통 인프라는 허브/스포크를 모른다`)가 깨지지 않아야 한다 — `ontology`가 `community`를 import하면 여기서 잡힌다.
 
 - [ ] **Step 3: 린트·포맷 검증**

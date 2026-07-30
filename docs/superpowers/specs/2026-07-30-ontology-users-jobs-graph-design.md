@@ -79,8 +79,17 @@ ontology_jobs
 
 ## 스크립트 실행 환경
 
-아래 두 스크립트는 모두 backend 컨테이너 안에서 실행한다
-(`docker exec pmhllll12-all-backend-1 python -m ontology.scripts.<모듈>`).
+아래 두 스크립트는 모두 backend 컨테이너 안, 작업 디렉터리 `/app`에서 실행한다.
+
+```
+docker exec pmhllll12-all-backend-1 python apps/ontology/scripts/<파일명>.py
+```
+
+기존 `apps/ontology/scripts/run_classifier_sample.py`와 같은 호출 방식이다. 각
+스크립트는 `sys.path`에 `/app`과 `/app/apps`를 직접 추가한다 — 컨테이너의
+`sys.path`에 프로젝트 경로가 들어 있지 않아서, 이게 없으면 `database`와
+`ontology` 모듈을 찾지 못한다.
+
 그 컨테이너에만 `DATABASE_URL`, `GEMINI_API_KEY`, 그리고 추가할 `NEO4J_*`가
 함께 있고 `neo4j` 드라이버도 설치돼 있다. 호스트에서 직접 실행하지 않는다.
 

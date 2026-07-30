@@ -72,7 +72,7 @@
 
 ## 테스트
 
-- **백엔드(`minho`)**: pytest. `pytest.ini`의 `testpaths = apps/titanic/tests`.
+- **백엔드(`minho`)**: pytest. `minho/pytest.ini`의 `testpaths`가 앱별 테스트 6곳을 모두 포함한다 — `apps/{titanic,admin,community,ontology,auth,moneyball}/tests`. 새 앱을 추가하면 이 목록에도 추가해야 실행된다.
 - **프런트엔드(`www`)**: 별도 테스트 프레임워크는 아직 설정돼 있지 않다(추가 시 이 절 갱신).
 
 ---

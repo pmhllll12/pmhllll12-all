@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import 'stopwatch_page.dart';
+import 'chat_page.dart';
 
 /// 영상이 **재생되기 시작한 시점부터** 인트로를 보여주는 시간.
 const _introDuration = Duration(seconds: 4);
@@ -13,7 +13,7 @@ const _introDuration = Duration(seconds: 4);
 const _readyTimeout = Duration(seconds: 10);
 
 /// 앱 시작 화면. `assets/video/intro.mp4` 를 재생하고, 재생 시작 4초 뒤
-/// [StopwatchPage] 로 넘어간다.
+/// [ChatPage] 로 넘어간다.
 class IntroVideoPage extends StatefulWidget {
   const IntroVideoPage({super.key});
 
@@ -47,7 +47,7 @@ class _IntroVideoPageState extends State<IntroVideoPage> {
           // 4초는 여기서부터 센다. initState에서 세기 시작하면 디버그 빌드의
           // 시작 지연(프레임 스킵 수 초)만으로 인트로가 끝나 버린다.
           _timer?.cancel();
-          _timer = Timer(_introDuration, _goToStopwatch);
+          _timer = Timer(_introDuration, _goToChat);
         })
         .catchError((Object error) {
           // 넘어가는 것은 아래 대기 한계 타이머가 책임지므로 화면은 검은
@@ -56,13 +56,13 @@ class _IntroVideoPageState extends State<IntroVideoPage> {
         });
 
     // 재생이 시작되지 않는 경우의 안전장치. 재생이 시작되면 위에서 교체된다.
-    _timer = Timer(_readyTimeout, _goToStopwatch);
+    _timer = Timer(_readyTimeout, _goToChat);
   }
 
-  void _goToStopwatch() {
+  void _goToChat() {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (_) => const StopwatchPage()),
+      MaterialPageRoute<void>(builder: (_) => const ChatPage()),
     );
   }
 

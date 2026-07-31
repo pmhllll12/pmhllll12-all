@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'stopwatch_page.dart';
+import 'intro_video_page.dart';
 
 /// 웹(`www/src/app/(site)/page.tsx`, `Hero.tsx`)의 다크 테마·시안 포인트 컬러를
 /// 그대로 옮긴 디자인 토큰. 웹뷰가 아닌 순수 Flutter 위젯으로 재구성한다.
@@ -42,7 +42,7 @@ class WorldCupApp extends StatelessWidget {
           surface: AppColors.bg1,
         ),
       ),
-      home: const StopwatchPage(),
+      home: const IntroVideoPage(),
     );
   }
 }

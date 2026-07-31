@@ -35,9 +35,15 @@ class _IntroVideoPageState extends State<IntroVideoPage> {
           _controller.setVolume(0);
           _controller.play();
           setState(() {});
+          debugPrint(
+            '[intro] 초기화 완료 size=${_controller.value.size} '
+            'duration=${_controller.value.duration}',
+          );
         })
-        .catchError((Object _) {
-          // 넘어가는 것은 타이머가 책임지므로 검은 화면으로 남겨 둔다.
+        .catchError((Object error) {
+          // 넘어가는 것은 타이머가 책임지므로 화면은 검은 상태로 두되,
+          // 원인은 로그로 남긴다.
+          debugPrint('[intro] 초기화 실패: $error');
         });
 
     // 영상 로딩·재생의 성공 여부와 무관하게 4초 뒤 넘어간다. 영상이 없거나

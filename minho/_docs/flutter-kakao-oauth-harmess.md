@@ -7,8 +7,9 @@ Flutter 앱이 카카오 SDK로 받은 토큰을 **백엔드가 검증하고 자
 인증 게이트웨이 분리 배포 ---> [`../apps/auth/_docs/auth-gateway-harness.md`](../apps/auth/_docs/auth-gateway-harness.md)
 백엔드 영역 지침 ---> [`../CLAUDE.md`](../CLAUDE.md)
 
-> 이 문서는 **구현 지시서**다. 아직 코드는 없다. 착수 전 아래 §1(현재 상태)과
-> §6(미결 질문)을 먼저 읽고, 미결 항목은 추측하지 말고 확인한다.
+> **구현·배포 완료(2026-08-03).** 갤럭시 노트9 실기기에서 카카오 로그인 →
+> 세션 생성까지 종단 확인했다. 이 문서는 착수 시점의 지시서에서 출발해 실제 결정과
+> 결과를 반영해 갱신한 것이며, 문서와 코드가 어긋나면 **코드가 정본**이다.
 
 ---
 
@@ -42,7 +43,8 @@ GET  /auth/.well-known/jwks.json
 - access token 수명 10분(`_ACCESS_TOKEN_EXPIRES_MIN`), refresh 14일
   (`REFRESH_TOKEN_TTL_SECONDS`). 이 값은 `core.security.create_refresh_token`의
   기본값과 **수동 동기화 상태**다 — 한쪽만 바꾸면 토큰 만료와 Redis TTL이 어긋난다.
-- `sub`는 **이메일**이다. 별도 users 테이블도 `user_id`도 현재 인증 경로에 없다 → §6-Q1.
+- 웹의 `sub`는 **이메일**이다. 별도 users 테이블도 `user_id`도 인증 경로에 없다.
+  **모바일은 이메일을 쓸 수 없어 `kakao:{회원번호}`를 `sub`로 쓴다** → §6-Q1.
 
 ---
 
@@ -85,7 +87,8 @@ HSET authgw:mobile:refresh:{sub}:{device_id}
   refresh_hash    <refresh token 원문의 SHA-256 hex>
   device_id       <X-Device-Id 헤더 값>
   device_model    <optional, ex: "SM-N960N">
-  kakao_id        <카카오 회원번호(문자열)>
+  kakao_id        <카카오 회원번호(문자열)> — sub의 근거
+  email           <optional> 인증에 쓰지 않는다. 카카오가 안 주면 빈 값 (§6-Q1)
   issued_at       <ISO8601>
   expires_at      <ISO8601>
   last_active_at  <ISO8601>
@@ -96,8 +99,8 @@ SADD   authgw:mobile:sessions:{sub} {device_id}
 
 - **refresh token 원문을 저장하지 않는다.** SHA-256 hex(`refresh_hash`)만 저장하고
   대조도 해시값으로 한다 (원안 §5-2).
-- TTL은 refresh token 만료 시각과 **같은 값**으로 `EXPIRE`. 모바일 30일 / 웹 14일
-  정책은 §6-Q2 확정 후 적용한다 (현재 코드는 플랫폼 구분 없이 14일 단일값).
+- TTL은 refresh token 만료 시각과 **같은 값**으로 `EXPIRE` — 모바일 30일 / 웹 14일
+  (§6-Q2). 실기기 로그인 후 `TTL` 이 2,591,980초(≈30.0일)로 확인됐다.
 - `authgw:mobile:sessions:{sub}` Set에는 TTL이 걸리지 않아 만료된 `device_id`가
   남는다 — 기기 목록 조회·`logout-all` 시 `EXISTS`로 걸러내고 `SREM`으로 청소한다.
 
@@ -147,8 +150,11 @@ Body   { "access_token": "<카카오 access token>" }
 |---|---|
 | 400 | `X-Device-Id` 누락 / body에 토큰 없음 |
 | 401 | 카카오 토큰 검증 실패(만료·위조) |
-| 403 | 카카오 계정에 이메일 동의가 없어 `sub`를 만들 수 없음 (`no_email`) |
-| 502 | 카카오 API 응답 실패·타임아웃 |
+| 502 | 카카오 API 응답 실패·타임아웃, 또는 응답에 회원번호가 없음 |
+| 503 | 카카오 설정 누락(`OAuthNotConfiguredError`) |
+
+> **403은 없다.** 초안에는 이메일 미동의 시 403이 있었지만, 이메일을 `sub`로 쓰지
+> 않기로 하면서 사라졌다 — §6-Q1.
 
 - 모바일은 **쿠키를 쓰지 않는다.** 토큰은 JSON 본문으로만 반환한다.
   `_set_token_cookies`는 웹 전용 — 모바일 경로에서 호출하지 말 것.
@@ -212,8 +218,8 @@ async def verify_id_token(id_token: str) -> dict           # 카카오 JWKS로 �
 
 ```
 class MobileSessionStore:
-    async def register(sub, device_id, refresh_token, kakao_id, device_model, ttl) -> None
-    async def rotate(sub, device_id, old_refresh_token, new_refresh_token, ttl) -> None
+    async def register(sub, device_id, refresh_token, refresh_jti, ttl, kakao_id, device_model, email) -> None
+    async def rotate(sub, device_id, old_refresh_token, new_refresh_token, new_refresh_jti, ttl) -> None
     async def revoke(sub, device_id) -> None
     async def revoke_all(sub) -> None
     async def list_devices(sub) -> list[dict]        # 선택 — 기기 목록 UI용
@@ -264,12 +270,11 @@ access JWT에 `platform: "mobile" | "web"` 클레임을 넣을지 — **넣기�
 
 `.env.*`는 커밋하지 않는다 (`auth-gateway-harness.md` §1 절대 규칙).
 
-> **`REDIS_URL` 확인 필요.** compose의 `auth` 서비스는 `.env.auth` 만 읽고
-> `environment:` 로 Redis 주소를 주지 않는다. `.env.auth` 에 값이 없으면 코드
-> 기본값 `redis://localhost:6379/0` 이 쓰이는데, 컨테이너 안에서 localhost는
-> Redis가 아니다 — `redis://redis:6379/0` 이어야 한다. 이건 모바일 때문에 생긴
-> 문제가 아니라 **기존 웹 세션에도 똑같이 걸리는 사항**이라 여기서 손대지 않고
-> 확인만 남긴다.
+> **`REDIS_URL` 은 이미 설정돼 있다** — 2026-08-03 EC2의 `.env.auth` 에서
+> `redis://redis:6379/0` 확인. compose의 `auth` 서비스는 `environment:` 로 Redis
+> 주소를 주지 않고 `.env.auth` 만 읽으므로, 이 값이 없으면 코드 기본값
+> `redis://localhost:6379/0` 이 쓰여 컨테이너 안에서 Redis를 못 찾는다.
+> 배포 환경을 새로 만들 때 빠뜨리기 쉬운 항목이라 남겨 둔다.
 
 ---
 
@@ -284,15 +289,28 @@ access JWT에 `platform: "mobile" | "web"` 클레임을 넣을지 — **넣기�
 | Q4 | **둘 다 구현.** `id_token`이 오고 서버에 `KAKAO_NATIVE_APP_KEY`가 있으면 로컬 검증, 아니면 `access_token` 원격 검증 | 콘솔에서 OIDC를 켜고 끌 때 앱을 다시 배포하지 않아도 된다. `router_mobile._verify_kakao` |
 | Q5 | **넣는다** (`platform: "mobile"`) | `create_access_token(platform=...)`은 기본값 `None`인 선택 인자라 웹 발급부는 그대로다 |
 
-**Q1은 여전히 열려 있고, 지금 코드는 (a)로 동작한다.**
+### Q1 — 모바일 `sub`는 **카카오 회원번호**다 (2026-08-03 결정)
 
-- 세션 키의 `{user_id}` 자리에 **이메일(`sub`)**이 들어간다 — 이 저장소의 인증
-  경로에는 users 테이블도 `user_id`도 없고 웹 흐름도 이메일을 `sub`로 쓴다.
-- 부작용: 이메일 동의를 받지 못한 카카오 계정은 로그인이 **403**이고, 사용자가
-  카카오 이메일을 바꾸면 세션이 끊긴다.
-- (b) users 테이블 + `kakao_id` 유니크 upsert로 가면 alembic 마이그레이션·모델이
-  추가되고 §2의 키 구조와 웹 흐름까지 함께 바뀐다. 그때 이 절을 다시 쓴다.
-  `kakao_id`는 이미 세션 Hash에 저장하고 있어 이관 시 매핑 근거로 쓸 수 있다.
+세션 키의 `{user_id}` 자리에 `kakao:{kakao_id}` 가 들어간다. 예:
+
+```
+authgw:mobile:refresh:kakao:5021010517:{device_id}
+```
+
+**이메일을 못 쓰는 이유:** 카카오는 이메일 수집을 **비즈니스 앱**(사업자등록번호 +
+심사) 전환 이후로 제한한다. 개인 개발자 앱에서는 콘솔의 동의항목 →
+개인정보 → `카카오계정(이메일)` 이 **"권한없음"** 으로 잠겨 있다(실기기 테스트 중 확인).
+이메일을 `sub`로 쓰면 카카오가 빈 문자열을 주고, 로그인이 **403**으로 전부 막힌다.
+
+**대가:** 웹 흐름(`router.py`)은 계속 이메일을 `sub`로 쓴다. 따라서 **같은 사람이
+웹과 모바일에서 서로 다른 `sub`를 갖는다.** 지금은 두 플랫폼이 세션을 공유하지
+않으므로 실질적 문제가 없지만, 한 사용자로 묶으려면 users 테이블에
+`kakao_id ↔ email` 매핑이 필요하다.
+
+**이관은 지금이 가장 싸다** — 모바일 세션은 오늘 처음 생겼고 users 테이블도
+없다. 나중에 데이터가 쌓인 뒤 바꾸면 기존 세션·사용자 매핑을 손으로 옮겨야 한다.
+이메일은 인증에 쓰지 않지만 세션 Hash의 `email` 필드에 남겨 두므로(받을 수 있을
+때만 채워진다) 이관 근거로 쓸 수 있다.
 
 ---
 

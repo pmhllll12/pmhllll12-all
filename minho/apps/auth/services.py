@@ -200,9 +200,14 @@ class MobileSessionStore:
         ttl_seconds: int,
         kakao_id: str = "",
         device_model: str = "",
+        email: str = "",
     ) -> None:
         """로그인 성공 시 세션을 만든다. 같은 기기로 다시 로그인하면 덮어쓴다 —
-        기기 하나당 세션 하나가 원칙이라 재로그인이 세션을 늘리지 않는다."""
+        기기 하나당 세션 하나가 원칙이라 재로그인이 세션을 늘리지 않는다.
+
+        `email`은 인증에 쓰이지 않는다(sub는 카카오 회원번호다). 운영 중 세션을
+        사람 눈으로 식별하려는 용도이고, 카카오 동의항목상 비어 있을 수 있다.
+        """
         client = self._get_client()
         now = _iso_now()
         key = self._key(sub, device_id)
@@ -215,6 +220,7 @@ class MobileSessionStore:
                 "device_id": device_id,
                 "device_model": device_model,
                 "kakao_id": kakao_id,
+                "email": email,
                 "issued_at": now,
                 "expires_at": (datetime.now(UTC) + timedelta(seconds=ttl_seconds)).isoformat(),
                 "last_active_at": now,

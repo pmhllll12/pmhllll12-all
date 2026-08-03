@@ -25,7 +25,12 @@ from core.matrix import kakao_oauth_client
 
 DEVICE_A = "device-aaa"
 DEVICE_B = "device-bbb"
+KAKAO_ID = "3123456789"
 EMAIL = "user@example.com"
+
+# sub는 이메일이 아니라 카카오 회원번호다 — 카카오가 개인 개발자 앱의 이메일
+# 수집을 막아서(비즈 앱 전환 필요) 이메일을 식별자로 쓸 수 없다.
+SUB = f"kakao:{KAKAO_ID}"
 
 
 @pytest.fixture()
@@ -45,7 +50,7 @@ def kakao_ok(monkeypatch):
     """카카오 access token 검증이 성공한 것으로 둔다."""
 
     async def _verify(access_token: str) -> dict:  # noqa: ARG001
-        return {"kakao_id": "3123456789", "email": EMAIL, "name": "테스트"}
+        return {"kakao_id": KAKAO_ID, "email": EMAIL, "name": "테스트"}
 
     monkeypatch.setattr(kakao_oauth_client, "verify_access_token", _verify)
 
@@ -61,7 +66,7 @@ def _login(client, device_id: str = DEVICE_A) -> dict:
 
 
 def _mobile_key(device_id: str) -> str:
-    return f"authgw:mobile:refresh:{EMAIL}:{device_id}"
+    return f"authgw:mobile:refresh:{SUB}:{device_id}"
 
 
 # --- 로그인 ----------------------------------------------------------------
@@ -76,7 +81,7 @@ def test_login_issues_token_pair_and_stores_session(client, fake_redis, kakao_ok
 
     session = fake_redis._hashes[_mobile_key(DEVICE_A)]
     assert session["platform"] == "mobile"
-    assert session["kakao_id"] == "3123456789"
+    assert session["kakao_id"] == KAKAO_ID
     assert session["device_model"] == "SM-N960N"
     # TTL은 refresh token 만료와 같은 값이어야 한다.
     assert fake_redis.expirations[_mobile_key(DEVICE_A)] == MOBILE_REFRESH_TOKEN_TTL_SECONDS
@@ -126,9 +131,11 @@ def test_login_with_invalid_kakao_token_is_401(client, monkeypatch):
     assert response.status_code == 401
 
 
-def test_login_without_email_consent_is_403(client, monkeypatch):
+def test_login_succeeds_without_email(client, fake_redis, monkeypatch):
+    """카카오가 개인 개발자 앱의 이메일 수집을 막으므로 이메일 없이도 로그인돼야 한다."""
+
     async def _verify(access_token: str) -> dict:  # noqa: ARG001
-        return {"kakao_id": "3123456789", "email": "", "name": "테스트"}
+        return {"kakao_id": KAKAO_ID, "email": "", "name": "테스트"}
 
     monkeypatch.setattr(kakao_oauth_client, "verify_access_token", _verify)
 
@@ -137,7 +144,24 @@ def test_login_without_email_consent_is_403(client, monkeypatch):
         json={"access_token": "t"},
         headers={"X-Device-Id": DEVICE_A},
     )
-    assert response.status_code == 403
+    assert response.status_code == 200
+    assert fake_redis._hashes[_mobile_key(DEVICE_A)]["kakao_id"] == KAKAO_ID
+
+
+def test_login_without_kakao_id_is_502(client, monkeypatch):
+    """회원번호가 없으면 세션 키를 만들 수 없다 — 카카오 응답 이상이므로 502."""
+
+    async def _verify(access_token: str) -> dict:  # noqa: ARG001
+        return {"kakao_id": "", "email": EMAIL, "name": "테스트"}
+
+    monkeypatch.setattr(kakao_oauth_client, "verify_access_token", _verify)
+
+    response = client.post(
+        "/auth/kakao/mobile",
+        json={"access_token": "t"},
+        headers={"X-Device-Id": DEVICE_A},
+    )
+    assert response.status_code == 502
 
 
 def test_login_when_kakao_api_fails_is_502(client, monkeypatch):
@@ -160,7 +184,7 @@ def test_login_prefers_id_token_when_configured(client, monkeypatch):
 
     async def _verify_id(id_token: str) -> dict:
         called.append(id_token)
-        return {"kakao_id": "3123456789", "email": EMAIL, "name": "테스트"}
+        return {"kakao_id": KAKAO_ID, "email": EMAIL, "name": "테스트"}
 
     async def _verify_access(access_token: str) -> dict:  # noqa: ARG001
         raise AssertionError("id_token이 있으면 access_token 경로를 타면 안 된다")
@@ -185,7 +209,7 @@ def test_login_falls_back_to_access_token_when_oidc_not_configured(client, monke
         raise OAuthNotConfiguredError("KAKAO_NATIVE_APP_KEY 없음")
 
     async def _verify_access(access_token: str) -> dict:  # noqa: ARG001
-        return {"kakao_id": "3123456789", "email": EMAIL, "name": "테스트"}
+        return {"kakao_id": KAKAO_ID, "email": EMAIL, "name": "테스트"}
 
     monkeypatch.setattr(kakao_oauth_client, "verify_id_token", _verify_id)
     monkeypatch.setattr(kakao_oauth_client, "verify_access_token", _verify_access)
@@ -369,3 +393,4 @@ def test_access_token_carries_platform_claim(client, kakao_ok):
     tokens = _login(client)
     payload = security.verify_token(tokens["access_token"], aud="api")
     assert payload.platform == "mobile"
+    assert payload.sub == SUB

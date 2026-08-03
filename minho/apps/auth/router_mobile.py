@@ -124,23 +124,35 @@ async def kakao_mobile_login(
             status.HTTP_502_BAD_GATEWAY, detail="카카오 서버와 통신할 수 없습니다."
         ) from exc
 
-    # sub가 이메일이라(웹 흐름과 동일) 이메일 동의가 없으면 세션을 만들 수 없다.
-    email = userinfo.get("email", "")
-    if not email:
+    # sub는 카카오 회원번호다 — 이메일이 아니다.
+    #
+    # 카카오는 이메일 수집을 비즈니스 앱(사업자등록번호 + 심사) 전환 이후로
+    # 제한한다. 개인 개발자 앱에서는 동의항목의 이메일이 "권한없음"으로 잠겨
+    # 있어(2026-08-03 콘솔에서 확인) 이메일을 sub로 쓰면 로그인 자체가 불가능하다.
+    #
+    # 웹 흐름(router.py)은 계속 이메일을 sub로 쓴다. 따라서 **같은 사람이 웹과
+    # 모바일에서 서로 다른 sub를 갖는다.** 둘을 한 사용자로 묶으려면 users 테이블에
+    # kakao_id ↔ email 매핑을 두어야 한다(_docs/flutter-kakao-oauth-harmess.md §6-Q1).
+    # 이메일은 받을 수 있으면 세션 정보로만 남긴다.
+    kakao_id = userinfo.get("kakao_id", "")
+    if not kakao_id:
+        logger.warning("[mobile] 카카오 응답에 회원번호가 없습니다: keys=%s", list(userinfo))
         raise HTTPException(
-            status.HTTP_403_FORBIDDEN, detail="이메일 제공에 동의해야 가입할 수 있습니다."
+            status.HTTP_502_BAD_GATEWAY, detail="카카오에서 회원 정보를 받지 못했습니다."
         )
+    sub = f"kakao:{kakao_id}"
 
-    access_token, refresh_token = issue_mobile_token_pair(email, aud=API_AUD)
+    access_token, refresh_token = issue_mobile_token_pair(sub, aud=API_AUD)
     refresh_payload = security.verify_token(refresh_token, aud="refresh")
     await store.register(
-        sub=email,
+        sub=sub,
         device_id=device_id,
         refresh_token=refresh_token,
         refresh_jti=refresh_payload.jti,
         ttl_seconds=MOBILE_REFRESH_TOKEN_TTL_SECONDS,
-        kakao_id=userinfo.get("kakao_id", ""),
+        kakao_id=kakao_id,
         device_model=x_device_model or "",
+        email=userinfo.get("email", ""),
     )
 
     return MobileTokenResponse(

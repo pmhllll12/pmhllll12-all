@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  개발 중에는 인증 게이트웨이를 http://<개발 PC LAN IP>:9000 으로 직접 부른다.
+  Android 9(API 28)부터 평문 HTTP 가 기본 차단이라 예외가 필요하다.
+
+  이 파일은 debug 소스 세트에만 있으므로 release 빌드에는 적용되지 않는다.
+  매니페스트에 android:usesCleartextTraffic="true" 를 넣는 방식은 release 까지
+  따라가므로 쓰지 않는다.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

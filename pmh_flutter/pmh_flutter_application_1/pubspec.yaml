@@ -38,6 +38,18 @@ dependencies:
   # 인트로 영상(assets/video/intro.mp4) 재생용.
   video_player: ^2.9.2
 
+  # 카카오 로그인. 전체 번들(kakao_flutter_sdk)이 아니라 user 모듈만 받는다 —
+  # 지도·메시지 API는 쓰지 않는다. common/auth(KakaoSdk, OAuthToken,
+  # isKakaoTalkInstalled)는 이 패키지가 재수출한다.
+  kakao_flutter_sdk_user: ^2.0.0
+
+  # 자체 JWT·device_id 보관. Android Keystore / iOS Keychain 을 쓴다.
+  # shared_preferences 는 루팅·백업 경로로 평문 노출되므로 쓰지 않는다.
+  flutter_secure_storage: ^10.3.1
+
+  # 인증 게이트웨이(:9000) 호출용.
+  http: ^1.6.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

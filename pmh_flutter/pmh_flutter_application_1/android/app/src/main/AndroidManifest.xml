@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 카카오 인증·인증 게이트웨이(:9000) 호출에 필요하다. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="pmh_flutter_application_1"
         android:name="${applicationName}"
@@ -25,6 +27,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- 카카오계정(웹) 로그인이 끝난 뒤 kakao<앱키>://oauth 로 앱에 돌아오는
+             경로. KAKAO_NATIVE_APP_KEY 는 app/build.gradle.kts 가
+             local.properties 에서 읽어 채운다. -->
+        <activity
+            android:name="com.kakao.sdk.flutter.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter android:label="flutter_web_auth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="kakao${KAKAO_NATIVE_APP_KEY}"
+                    android:host="oauth" />
+            </intent-filter>
+        </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -41,5 +58,8 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Android 11+ 의 패키지 가시성 제한. 이게 없으면 카카오톡이 깔려 있어도
+             isKakaoTalkInstalled() 가 항상 false 라 앱 전환 로그인이 되지 않는다. -->
+        <package android:name="com.kakao.talk"/>
     </queries>
 </manifest>

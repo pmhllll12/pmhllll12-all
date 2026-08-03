@@ -4,4 +4,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- 개발 PC 의 인증 게이트웨이를 평문 http 로 부르기 위한 예외. -->
+    <application android:networkSecurityConfig="@xml/network_security_config"/>
 </manifest>

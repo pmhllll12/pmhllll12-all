@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
+import 'auth.dart';
 import 'intro_video_page.dart';
+import 'stopwatch_page.dart';
 
 /// 웹(`www/src/app/(site)/page.tsx`, `Hero.tsx`)의 다크 테마·시안 포인트 컬러를
 /// 그대로 옮긴 디자인 토큰. 웹뷰가 아닌 순수 Flutter 위젯으로 재구성한다.
@@ -19,12 +22,31 @@ class AppColors {
   static const chipBorder = Color(0x38949CB8); // rgba(148,163,184,.22)
 }
 
-void main() {
-  runApp(const WorldCupApp());
+Future<void> main() async {
+  // 플러그인(시크릿 저장소·카카오 SDK)을 runApp 이전에 쓰므로 바인딩을 먼저 띄운다.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (kakaoNativeAppKey.isEmpty) {
+    debugPrint(
+      '[main] KAKAO_NATIVE_APP_KEY 가 비어 있습니다 — 카카오 로그인이 실패합니다. '
+      '--dart-define=KAKAO_NATIVE_APP_KEY=... 로 빌드하세요.',
+    );
+  }
+  await KakaoSdk.init(nativeAppKey: kakaoNativeAppKey);
+
+  // 한 번 로그인한 기기는 인트로·로그인 화면을 건너뛴다. 모바일 세션(리프레시
+  // 토큰)이 살아 있는 동안은 여기서 곧장 스톱워치로 들어간다.
+  final hasSession = await AuthService.instance.hasStoredSession();
+  debugPrint('[main] 저장된 모바일 세션 ${hasSession ? '있음' : '없음'}');
+
+  runApp(WorldCupApp(hasSession: hasSession));
 }
 
 class WorldCupApp extends StatelessWidget {
-  const WorldCupApp({super.key});
+  const WorldCupApp({super.key, required this.hasSession});
+
+  /// 참이면 인트로·로그인을 건너뛰고 [StopwatchPage] 로 시작한다.
+  final bool hasSession;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +64,7 @@ class WorldCupApp extends StatelessWidget {
           surface: AppColors.bg1,
         ),
       ),
-      home: const IntroVideoPage(),
+      home: hasSession ? const StopwatchPage() : const IntroVideoPage(),
     );
   }
 }

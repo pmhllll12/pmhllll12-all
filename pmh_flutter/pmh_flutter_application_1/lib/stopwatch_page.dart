@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import 'image_upload_page.dart';
+
 /// iPhone 시계 앱의 스톱워치 화면을 순수 Flutter 위젯으로 재구성한다.
 ///
 /// 경과 시간의 유일한 출처는 `dart:core`의 [Stopwatch]다. [Ticker]는 매 프레임
@@ -26,6 +28,10 @@ class _SwColors {
   static const disabledLabel = Color(0xFF6E6E73);
   static const shortest = Color(0xFF30D158);
   static const longest = Color(0xFFFF453A);
+
+  /// 스톱워치 팔레트에는 없는 색이다 — 앱의 시안 포인트를 그대로 써서 이 버튼이
+  /// 스톱워치 기능이 아니라 **다른 화면으로 나가는 입구**임을 구분한다.
+  static const uploadEntry = Color(0xFF22D3EE);
 }
 
 /// 총 경과 시간에서 완료된 랩을 빼 **진행 중인 랩**의 시간을 구한다.
@@ -106,7 +112,27 @@ class _StopwatchPageState extends State<StopwatchPage>
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 48),
+            // 로그인 후 도착하는 화면이라, 다른 기능으로 가는 입구를 여기 둔다.
+            // 아이콘만 두면 검은 배경 모서리에 묻혀 안 보인다 — 글자를 함께 둔다.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const ImageUploadPage()),
+                  ),
+                  icon: const Icon(Icons.cloud_upload_outlined, size: 20),
+                  label: const Text('이미지 업로드'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: _SwColors.uploadEntry,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
             _TimeDisplay(elapsed: elapsed),
             const SizedBox(height: 40),
             _ControlButtons(

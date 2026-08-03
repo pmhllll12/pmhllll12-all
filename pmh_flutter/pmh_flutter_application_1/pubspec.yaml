@@ -50,6 +50,14 @@ dependencies:
   # 인증 게이트웨이(:9000) 호출용.
   http: ^1.6.0
 
+  # multipart 파트의 Content-Type 지정용(MediaType). http의 전이 의존이지만
+  # 코드에서 직접 쓰므로 명시한다 — 안 넣으면 파일이 octet-stream으로 올라가
+  # 서버가 422로 되돌린다.
+  http_parser: ^4.1.2
+
+  # S3 업로드 화면의 이미지 선택(갤러리·카메라).
+  image_picker: ^1.2.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

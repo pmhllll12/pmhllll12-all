@@ -19,6 +19,7 @@ if str(_CORE_ROOT) not in sys.path:
     sys.path.append(str(_CORE_ROOT))
 
 from auth.router import router as auth_router
+from auth.router_mobile import router as auth_mobile_router
 from fastapi import FastAPI
 
 app = FastAPI(
@@ -28,6 +29,8 @@ app = FastAPI(
     openapi_url=None,
 )
 app.include_router(auth_router, prefix="/auth")
+# 모바일(Flutter) 경로. 웹과 라우터를 분리해 세션 저장 로직이 섞이지 않게 한다.
+app.include_router(auth_mobile_router, prefix="/auth")
 
 
 @app.get("/healthz")

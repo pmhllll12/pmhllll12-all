@@ -4,6 +4,7 @@ import logging
 
 from auth.schemas import LoginRequest, RefreshRequest, TokenResponse
 from auth.services import (
+    ACCESS_TOKEN_EXPIRES_MIN,
     REFRESH_TOKEN_TTL_SECONDS,
     ProviderNotSupportedError,
     RefreshReuseDetectedError,
@@ -30,7 +31,9 @@ router = APIRouter(tags=["auth"])
 
 _ACCESS_COOKIE = "access_token"
 _REFRESH_COOKIE = "refresh_token"
-_ACCESS_TOKEN_EXPIRES_MIN = 10
+# 모바일 라우터와 같은 값을 써야 해서 services로 올렸다 — 두 곳에 10을 적어 두면
+# 한쪽만 바뀌었을 때 알아채지 못한다.
+_ACCESS_TOKEN_EXPIRES_MIN = ACCESS_TOKEN_EXPIRES_MIN
 
 
 def _set_token_cookies(response: Response, access_token: str, refresh_token: str) -> None:

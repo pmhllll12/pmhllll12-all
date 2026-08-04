@@ -5,13 +5,21 @@ AWS 자격증명도 네트워크도 필요 없다는 점이 포트/어댑터 분
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import pytest
+from admin.app.dtos.receipt_ocr_dto import ReceiptImageRef
 from admin.app.dtos.s3_image_upload_dto import UploadImageCommand
 from admin.app.ports.output.image_storage_port import (
     ImageStoragePort,
     ImageStorageUnavailableError,
 )
-from admin.app.use_cases.s3_image_upload_interactor import S3ImageUploadInteractor
+from admin.app.ports.output.receipt_image_repository_port import ReceiptImageRepositoryPort
+from admin.app.ports.output.receipt_ocr_port import ReceiptOcrPort
+from admin.app.use_cases.s3_image_upload_interactor import (
+    ReceiptOcrInteractor,
+    S3ImageUploadInteractor,
+)
 from admin.domain.entities.s3_image_entity import MAX_IMAGE_BYTES, ImageUploadRejected
 
 PNG = b"\x89PNG\r\n\x1a\n" + b"0" * 32
@@ -94,3 +102,55 @@ async def test_storage_failure_propagates_as_port_error():
 
     with pytest.raises(ImageStorageUnavailableError):
         await interactor.upload(_command())
+
+
+class FakeReceiptRepository(ReceiptImageRepositoryPort):
+    def __init__(self, refs: list[ReceiptImageRef]) -> None:
+        self._refs = refs
+        self._content_by_key = {ref.key: (b"jpeg-bytes", "image/jpeg") for ref in refs}
+
+    async def list_receipts(self) -> list[ReceiptImageRef]:
+        return self._refs
+
+    async def download(self, key: str) -> tuple[bytes, str]:
+        return self._content_by_key[key]
+
+
+class FakeReceiptOcr(ReceiptOcrPort):
+    def __init__(self) -> None:
+        self.calls: list[tuple[bytes, str]] = []
+
+    async def extract_text(self, content: bytes, mime_type: str) -> str:
+        self.calls.append((content, mime_type))
+        return "스타벅스 강남점\n아메리카노 4,500원"
+
+
+@pytest.mark.anyio
+async def test_list_receipts_with_ocr_returns_text_per_image():
+    refs = [
+        ReceiptImageRef(
+            key="receipts/900__20260131__171210.jpg",
+            filename="900__20260131__171210.jpg",
+            uploaded_at=datetime(2026, 1, 31, 17, 12, 10, tzinfo=UTC),
+        )
+    ]
+    repository = FakeReceiptRepository(refs)
+    ocr = FakeReceiptOcr()
+    interactor = ReceiptOcrInteractor(receipts=repository, ocr=ocr)
+
+    results = await interactor.list_receipts_with_ocr()
+
+    assert len(results) == 1
+    assert results[0].key == "receipts/900__20260131__171210.jpg"
+    assert results[0].filename == "900__20260131__171210.jpg"
+    assert results[0].ocr_text == "스타벅스 강남점\n아메리카노 4,500원"
+    assert ocr.calls == [(b"jpeg-bytes", "image/jpeg")]
+
+
+@pytest.mark.anyio
+async def test_list_receipts_with_ocr_empty_folder_returns_empty_list():
+    interactor = ReceiptOcrInteractor(receipts=FakeReceiptRepository([]), ocr=FakeReceiptOcr())
+
+    results = await interactor.list_receipts_with_ocr()
+
+    assert results == []

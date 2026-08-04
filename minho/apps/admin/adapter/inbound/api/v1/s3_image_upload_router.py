@@ -16,11 +16,20 @@
 
 from __future__ import annotations
 
-from admin.adapter.inbound.schema.s3_image_upload_schema import S3ImageUploadResponse
+from admin.adapter.inbound.schema.s3_image_upload_schema import (
+    ReceiptOcrResponse,
+    S3ImageUploadResponse,
+)
 from admin.app.dtos.s3_image_upload_dto import UploadImageCommand
-from admin.app.ports.input.s3_image_upload_use_case import S3ImageUploadUseCase
+from admin.app.ports.input.s3_image_upload_use_case import (
+    ReceiptOcrUseCase,
+    S3ImageUploadUseCase,
+)
 from admin.app.ports.output.image_storage_port import ImageStorageUnavailableError
-from admin.dependencies.s3_image_upload_provider import get_s3_image_upload_use_case
+from admin.dependencies.s3_image_upload_provider import (
+    get_receipt_ocr_use_case,
+    get_s3_image_upload_use_case,
+)
 from admin.domain.entities.s3_image_entity import (
     ALLOWED_CONTENT_TYPES,
     MAX_IMAGE_BYTES,
@@ -85,3 +94,28 @@ async def get_allowed_types() -> dict[str, object]:
         "allowed_content_types": sorted(ALLOWED_CONTENT_TYPES),
         "max_bytes": MAX_IMAGE_BYTES,
     }
+
+
+@s3_image_upload_router.get(
+    "/receipts",
+    response_model=list[ReceiptOcrResponse],
+    summary="receipts/ 폴더 영수증 이미지를 Gemini OCR로 읽어 반환",
+)
+async def get_receipts(
+    use_case: ReceiptOcrUseCase = Depends(get_receipt_ocr_use_case),
+) -> list[ReceiptOcrResponse]:
+    """`receipts/` 폴더의 영수증 이미지를 나열하고 각각 OCR 텍스트를 붙여 돌려줍니다."""
+    try:
+        results = await use_case.list_receipts_with_ocr()
+    except ImageStorageUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    return [
+        ReceiptOcrResponse(
+            key=result.key,
+            filename=result.filename,
+            uploaded_at=result.uploaded_at,
+            ocr_text=result.ocr_text,
+        )
+        for result in results
+    ]

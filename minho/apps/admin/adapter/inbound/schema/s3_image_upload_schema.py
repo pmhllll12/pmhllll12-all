@@ -12,3 +12,10 @@ class S3ImageUploadResponse(BaseModel):
     url: str
     uploaded_at: str
     message: str = "uploaded"
+
+
+class ReceiptOcrResponse(BaseModel):
+    key: str
+    filename: str
+    uploaded_at: str
+    ocr_text: str

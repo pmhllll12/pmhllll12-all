@@ -15,6 +15,8 @@ flutter pub get
 flutter run
 ```
 
+안드로이드 실기기(USB·Wi-Fi 무선 디버깅) 연동 ---> [`_docs/flutter-android-harness.md`](_docs/flutter-android-harness.md)
+
 ---
 
 ## Lint / Format

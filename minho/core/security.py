@@ -49,6 +49,9 @@ class TokenPayload:
     exp: int
     iat: int
     jti: str
+    # "mobile" | "web" | None. 발급 경로가 갈린 뒤 붙었으므로 기존 토큰에는 없다
+    # — 검증부가 None을 정상으로 다뤄야 한다.
+    platform: str | None = None
 
 
 def _load_key(env_var: str) -> str:
@@ -77,8 +80,14 @@ def _kid() -> str:
 
 
 def create_access_token(
-    sub: str, roles: list[str], aud: str, expires_min: int = 10
+    sub: str,
+    roles: list[str],
+    aud: str,
+    expires_min: int = 10,
+    platform: str | None = None,
 ) -> str:
+    """`platform`은 선택 인자다 — 기존 웹 발급부는 그대로 두고 모바일만 클레임을
+    붙인다. 없으면 클레임 자체를 넣지 않아 기존 토큰과 형태가 같다."""
     private_key = _load_key("JWT_PRIVATE_KEY")
     now = datetime.now(UTC)
     payload = {
@@ -89,6 +98,8 @@ def create_access_token(
         "exp": now + timedelta(minutes=expires_min),
         "jti": str(uuid.uuid4()),
     }
+    if platform is not None:
+        payload["platform"] = platform
     return jwt.encode(
         payload, private_key, algorithm=_ALGORITHM, headers={"kid": _kid()}
     )
@@ -128,6 +139,7 @@ def verify_token(token: str, aud: str) -> TokenPayload:
         exp=payload["exp"],
         iat=payload["iat"],
         jti=payload["jti"],
+        platform=payload.get("platform"),
     )
 
 

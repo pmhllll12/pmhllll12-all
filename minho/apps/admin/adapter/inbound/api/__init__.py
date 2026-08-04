@@ -21,6 +21,9 @@ from admin.adapter.inbound.api.v1.piper_gilfoyle_system_router import (
 from admin.adapter.inbound.api.v1.piper_hendricks_ceo_router import (
     hendricks_ceo_router as piper_hendricks_ceo_router,
 )
+from admin.adapter.inbound.api.v1.s3_image_upload_router import (
+    s3_image_upload_router as _s3_image_upload_router,
+)
 from fastapi import APIRouter
 
 silicon_valley_router = APIRouter(prefix="/api/v1", tags=["silicon_valley"])
@@ -56,5 +59,7 @@ silicon_valley_router.include_router(piper_bighetti_hr_router)
 
 admin_pdf_router.include_router(_pdf_loader_router)
 admin_pdf_router.include_router(_langchain_chat_router)
+# 이름은 `admin_pdf_router`지만 실제로는 `/api/admin` 아래 admin API 전부를 모은다.
+admin_pdf_router.include_router(_s3_image_upload_router)
 
 __all__ = ["silicon_valley_router", "admin_pdf_router"]

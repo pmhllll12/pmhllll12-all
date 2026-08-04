@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude가 응답을 기다리고 있습니다\" with title \"Claude Code\"' 2>/dev/null || notify-send \"Claude Code\" \"Claude가 응답을 기다리고 있습니다\" 2>/dev/null || printf '\\a'"
+          }
+        ]
+      }
+    ]
+  }
+}

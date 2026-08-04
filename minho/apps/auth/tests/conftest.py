@@ -47,9 +47,26 @@ class FakeRedis:
     def __init__(self) -> None:
         self._store: dict[str, str] = {}
         self._sets: dict[str, set[str]] = {}
+        # 모바일 세션은 Hash다. TTL은 실제로 만료시키지 않고 마지막 값만 기록해
+        # "EXPIRE를 걸었는가"를 테스트가 확인할 수 있게 한다.
+        self._hashes: dict[str, dict[str, str]] = {}
+        self.expirations: dict[str, int] = {}
 
     async def set(self, key: str, value: str, ex: int | None = None) -> None:  # noqa: ARG002
         self._store[key] = value
+
+    async def hset(self, key: str, mapping: dict[str, str]) -> None:
+        self._hashes.setdefault(key, {}).update(mapping)
+
+    async def hgetall(self, key: str) -> dict[str, str]:
+        return dict(self._hashes.get(key, {}))
+
+    async def expire(self, key: str, ttl_seconds: int) -> None:
+        self.expirations[key] = ttl_seconds
+
+    def keys(self) -> list[str]:
+        """테스트 전용 — 어떤 키가 남아 있는지 직접 확인할 때 쓴다."""
+        return sorted({*self._store, *self._sets, *self._hashes})
 
     async def get(self, key: str) -> str | None:
         return self._store.get(key)
@@ -67,9 +84,11 @@ class FakeRedis:
         for key in keys:
             self._store.pop(key, None)
             self._sets.pop(key, None)
+            self._hashes.pop(key, None)
+            self.expirations.pop(key, None)
 
     async def exists(self, key: str) -> int:
-        return 1 if key in self._store else 0
+        return 1 if key in self._store or key in self._hashes else 0
 
 
 @pytest.fixture()

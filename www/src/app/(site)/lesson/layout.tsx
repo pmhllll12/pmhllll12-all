@@ -237,6 +237,13 @@ export default function LessonLayout({
               >
                 크롤러/스크래퍼
               </Link>
+              <Link
+                href="/rag-system/receipt"
+                className={sublinkClass(pathname === "/rag-system/receipt")}
+                onClick={closeMenu}
+              >
+                영수증
+              </Link>
             </div>
           </details>
         </aside>

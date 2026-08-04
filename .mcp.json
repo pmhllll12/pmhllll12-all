@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "github": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "my-internal-tools": {
+      "type": "stdio",
+      "command": "/home/ec2-user/pmhllll12-all/.venv/bin/python",
+      "args": [
+        "/home/ec2-user/pmhllll12-all/minho/apps/admin/adapter/inbound/mcp/piper_gilfoyle_system_tools.py"
+      ]
+    }
+  }
+}

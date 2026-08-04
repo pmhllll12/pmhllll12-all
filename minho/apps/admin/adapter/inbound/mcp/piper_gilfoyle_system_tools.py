@@ -9,3 +9,7 @@ mcp = FastMCP("Gilfoyle")
 @mcp.tool(name="Gilfoyle")
 async def introduce_myself() -> str:
     return "파이드 파이퍼 시스템 아키텍트 버트럼 길포일입니다."
+
+
+if __name__ == "__main__":
+    mcp.run()

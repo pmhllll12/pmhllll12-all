@@ -86,6 +86,9 @@ docker compose up --build -d
 | 엔티티·PK | [`_docs/entity-rules.md`](_docs/entity-rules.md) |
 | Alembic | [`alembic/README.md`](alembic/README.md) |
 | 스타 토폴로지(허브/스포크/온톨로지) | [`_docs/architecture-star-topology.md`](_docs/architecture-star-topology.md) |
+| pgvector 덤프·DB 이관 | [`_docs/pgvector-dump-strategy.md`](_docs/pgvector-dump-strategy.md) |
+| 이미지 S3 업로드(IAM 역할·nginx 상한 포함) | [`_docs/s3-image-upload.md`](_docs/s3-image-upload.md) |
+| 카카오 모바일 로그인 | [`_docs/flutter-kakao-oauth-harmess.md`](_docs/flutter-kakao-oauth-harmess.md) |
 
 ---
 
